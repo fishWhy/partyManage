@@ -1,0 +1,5 @@
+/* 属性选择器 */
+[class*=" el-icon-lx"],
+[class^=el-icon-lx] {
+    font-family: lx-iconfont !important;
+}
