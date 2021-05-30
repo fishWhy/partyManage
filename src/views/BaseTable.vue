@@ -344,7 +344,7 @@ export default {
             // 设置一个锁，防止换页时自动更改selectedItem
             selectedItemLock:false,
 
-            attriShow:["stuId","name","gender","national","birthday","branch","proED","grade","tclass","stage"],
+            attriShow:["stage","stuId","name","gender","national","home","birthday","idCard","branch","proED","grade","tclass",],
             
             
 

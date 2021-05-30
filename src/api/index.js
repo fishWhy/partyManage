@@ -478,7 +478,7 @@ let dataFun = (function(){
                 if(Object.prototype.hasOwnProperty.call(item,k)){
                 //》》》》这里其实涉及到一个问题，我们通过importfxx从表格获取的数据不一定都是字符串类型的数据，
                     item[k] = item[k]+'';
-                    if(k==="actvTrainTime"||k==='devTrainTime'){
+                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
                         
                         arr = item[k].split(',');
                         item[k] = arr;
