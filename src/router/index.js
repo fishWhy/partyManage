@@ -8,6 +8,7 @@ const routes = [
     {
         path: '/',
         redirect: '/login'
+        // redirect: '/home/table'
     }, {
         path: "/home",
         name: "Home",

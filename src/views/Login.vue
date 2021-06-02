@@ -97,14 +97,14 @@
 </template>
 
 <script>
-import {getStartDataFromBackend} from '../api/index.js'
+import {getStartDataFromBackend,changePsw} from '../api/index.js'
 export default {
     data() {
         return {
             isLogin:true,
             param: {
-                userName: "1971172",
-                password: "123456"
+                userName: "00008612",
+                password: "1234561"
             },
             rules: {
                 userName: [
@@ -160,11 +160,14 @@ export default {
                     // });
                     
 
-                    getStartDataFromBackend(this.param).then(()=>{
+                    getStartDataFromBackend(this.param).then((duty)=>{
                         // this.$router.push("/home/table");
                         let stuId = this.param.userName
-                        // this.$store.commit('setRole',{stuId:stuId, role:'student'})
-                        this.$store.commit('setRole',{stuId:stuId, role:'teacher'})
+                        if(duty>1){
+                            this.$store.commit('setRole',{stuId:stuId, role:'teacher'})
+                        }else{
+                            this.$store.commit('setRole',{stuId:stuId, role:'student'})
+                        }
                         this.$router.push({path:'/home/table'});
                         this.$message.success("登录成功");
                     },(item)=>{
@@ -182,9 +185,18 @@ export default {
             });
         },
         changePassword(){
-            if(this.nPassword.password!==this.nPassword.nPassword){
+            if(this.nPassword.confirmNPassword!==this.nPassword.nPassword){
                     this.$message.error("请保证两次输入的新密码相同");
                     return;
+            }else{
+                changePsw(this.nPassword).then((isSetNew)=>{
+                    if(isSetNew){
+                        this.$message.success("重置密码成功，请重新登录");
+                        this.isLogin = true;
+                    }else{
+                        this.$message.error("设置失败，请重新设置");
+                    }
+                })
             }
             console.log(this.nPassword);
         }

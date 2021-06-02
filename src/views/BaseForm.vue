@@ -70,11 +70,12 @@
 import  tableDetail from "../components/tableDetail.vue"
 
 
-import {tableForm} from "../api/formDate.js"
+import {getTableForm} from "../api/formDate.js"
 // dateTranfer
 
 import {fetchDataByStuId,cInfor, addDate,isInDate} from "../api/index";
 // addDate,cInfor,fetchData,
+// import {}
 
 export default {
     name: "baseform",
@@ -85,25 +86,57 @@ export default {
         console.log('actvStage')
     },
     unmounted(){
-        console.log('destroyed baseForm.vue')
+        console.log('destroyed baseForm.vue');
+        this.person = {};
+
+    },
+    computed:{
+        delTags(){
+            for(let i=0;i<this.$store.state.delTags.length;i++){
+                if(this.$store.state.delTags[i].path === this.path){
+                    return true;
+                }
+            }
+            return false;
+        }
+    },
+    watch:{
+        delTags(newValue){
+            // console.log('outside delTags',newValue,this.path);
+            if(newValue){
+               this.resetData();
+            }
+        }
     },
     created(){
         console.log('here createBaseForm');
+        this.path = this.$route.fullPath;
+        // console.log('creat baseForm router:',this.$route)
         if(this.$route.query.isDisabled==="false"){
             this.disabled = false;
             this.status = 2;//表示 添加用户的状态
+            this.person = {};
         }else{
             this.disabled = true;
             this.status = 1;//表示 详情/修改的状态
-        }
+            this.person = fetchDataByStuId(this.$route.query.stuId);
+            console.log('person:',this.person);
 
-        this.person = fetchDataByStuId(this.$route.query.stuId);
+        }
 
         console.log('here get person:',this.person)
 
+        this.tableForm = getTableForm();
+        console.log('tableForm:',this.tableForm)
+        this.tableDetail = this.tableForm.tableDetail;//基本信息
+        this.applyStage = this.tableForm.applyStage;//申请入党阶段
+        this.actvStage = this.tableForm.actvStage;//入党积极分子的确定和培养阶段
+        this.devStage = this.tableForm.devStage;//发展对象的确定和考察阶段
+        this.candidateStage = this.tableForm.candidateStage;// 预备党员的接收阶段
+        this.positiveStage = this.tableForm.positiveStage;// 预备党员的教育考察和转正阶段
+
         //构建表单中要显示的值
         let atribute = [];
-
         this.tableDetail.forEach(item=>{
             atribute.push(item.prop);
         })
@@ -152,83 +185,22 @@ export default {
         })
         
         
-
     },
 
     data() {
         return {
+            path:'',
             disabled:true,
             status:0,
-            person: {
-                stuId:"1871232",//学号
-                name:'孙亮',//姓名
-                gender:'1',//性别
-                phone:'123415',//联系方式
-                national:'1',//民族
-                home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-                idCard:'13141414',//身份证
-                birthday:'1995-01-02',//出生日期
-                grade:'1',//年级
-                class:'1',//班级
-                proED:'1',//学历
-                tutor:'张李',//导师
-                stage:'1',//所处阶段
-                bedroom:'3舍A231',//寝室
-                duty:'班长',//职务
-                branch:'1',//所在支部
-                imgUrl:'',//照片
+            person: {},
+            tableForm:'',
 
-                pTeacher:'李福',//培养联系人
-                leader:'上官云',//入党介绍人
-                applyFileNumber:'13415',//入党志愿书编号
-
-
-                // 申请入党阶段
-                applyTime:'2019-09-20',//申请入党时间
-                talkTime:'2019-10-05',//谈心谈话时间
-
-                //入党积极分子的确定和培养阶段
-                electLeagueTime:'2019-10-25',//团推优时间
-                actvTime:'2020-05-1',//确定积极分子时间
-                actvTrainTime:'2020-07-08',//积极分子培训时间
-                actvTrainResult:'1',//积极分子培训班结业情况
-
-                //发展对象的确定和考察阶段
-                devTime:'2020-12-01',//确定发展对象时间
-                devTrainTime:['2020-07-08','2020-08-01'],//发展对象培训时间
-                devTrainResult:'1',//发展对象培训班结业情况
-                classRank:'6',//业务课排名
-                extFileTime:'2021-04-12',//外调材料日期
-                polFileTime:'2021-04-12',//政审材料日期
-                candidateTime:'2021-04-02',//拟发展时间
-                hPartyPreCheckTime:'2021-04-18',//发展党员上级党委预审日期
-                pubTime:'2021-05-01',//公示日期
-
-                // 预备党员的接收阶段
-                jnTime:'2021-05-02',//入党时间
-                aPartyCheckTime:'2021-05-03',//入党总支审查日期
-                hPartyTalkTime:'2021-05-04',//发展党员上级组织谈话日期
-                hPartyPassTime:'2021-05-05',//入党上级党委审批日期
-
-
-                // 预备党员的教育考察和转正阶段
-                confirmTime:'2021-05-06',//转正时间
-                partyConfirmTime:'2021-05-06',//转正总支审查日期
-                hPartyConfirmTime:'2021-05-07',//转正上级党委审批日期
-                delayReadyTime:'2021-05-08',//延长预备期日期
-                delayCheckTime:'2021-05-08',//延长预备期总支审查日期
-                delayConfirmTime:'2021-05-12',//延长预备期党委审批日期
-
-
-                note:'信息好多，代码好长',//备注
-            },
-
-            tableDetail:tableForm.tableDetail,//基本信息
-            applyStage:tableForm.applyStage,//申请入党阶段
-            actvStage:tableForm.actvStage,//入党积极分子的确定和培养阶段
-            devStage:tableForm.devStage,//发展对象的确定和考察阶段
-            candidateStage:tableForm.candidateStage,// 预备党员的接收阶段
-            positiveStage:tableForm.positiveStage,// 预备党员的教育考察和转正阶段
+            tableDetail:'',//基本信息
+            applyStage:'',//申请入党阶段
+            actvStage:'',//入党积极分子的确定和培养阶段
+            devStage:'',//发展对象的确定和考察阶段
+            candidateStage:'',// 预备党员的接收阶段
+            positiveStage:'',// 预备党员的教育考察和转正阶段
 
 
             detailContent:{},
@@ -242,6 +214,19 @@ export default {
     },
 
     methods: {
+        resetData(){
+            if(this.status == 2){
+                this.person = {};
+                this.disabled = false;
+                this.detailContent = {};
+                this.applyContent = {};
+                this.actvStageContent = {};
+                this.devStageContent = {};
+                this.candidateContent = {};
+                this.positiveContent = {};
+            }
+           
+        },
         getDateFromTableForm(){
             return Object.assign({}, 
                 this.$refs.tableDetail.getDate(),
@@ -333,7 +318,8 @@ export default {
                
 
             }finally{
-                 console.log('the edit data:',nData);
+                this.resetData();
+                console.log('the edit data:',nData);
             }
         },
 
@@ -415,7 +401,7 @@ export default {
 
             }
             rn += "<br/>"
-            console.log('checkTime:',rn);
+            // console.log('checkTime:',rn);
 
             return rn;
         },
@@ -426,6 +412,7 @@ export default {
                 $router: this.$router,
                 $route: this.$route
             });
+            this.resetData();
             // this.$router.push({path:'/home/table'});
         },
 

@@ -113,6 +113,7 @@ export default {
     methods:{
       getData(){
         this.tableData = getBranchsData();
+        console.log('this.branchData',this.tableData);
       },
       handleDetail:function(index, row){
         console.log(row);

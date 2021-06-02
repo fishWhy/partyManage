@@ -5,7 +5,8 @@ export default createStore({
         tagsList: [],
         collapse: true,
         baseTable:{},
-        role:{}
+        role:{},
+        delTags:{},
     },
     mutations: {
         setRole(state,_role){
@@ -13,9 +14,12 @@ export default createStore({
             state.role.role = _role.role;
         },
         delTagsItem(state, data) {
-            state
+            let delt = state
                 .tagsList
                 .splice(data.index, 1);
+            state.delTags = delt;
+            
+            // console.log('delt:',delt);
         },
         setTagsItem(state, data) {
             state

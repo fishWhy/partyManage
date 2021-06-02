@@ -126,6 +126,11 @@ export default{
         this.dateItems = JSON.parse(JSON.stringify(this.content));
         // console.log('dateItems',this.dateItems);
     },
+    watch:{
+        content(newVale){
+            this.dateItems = JSON.parse(JSON.stringify(newVale));
+        }
+    },
 
     data(){
        return {
@@ -249,7 +254,7 @@ export default{
                     
 
                     val2 = val[1];
-                     if(val instanceof Date){
+                     if(val2 instanceof Date){
                         y = val2.getFullYear();
                         m=val2.getMonth()+1;
                         d=val2.getDate();
@@ -259,6 +264,8 @@ export default{
                     }else {
                         rnDate[item][1] = val2 + '';
                     }
+
+                    // rnDate[item] = val1 + ',' + val2;
 
                     
                 }else{
@@ -274,6 +281,12 @@ export default{
             // console.log('rn:',rn);
 
             Object.keys(rn).forEach(item=>{
+                // if(item=='home'){
+                //     console.log('home',rn[item]);
+                // }
+                if(item ==='home'){
+                    rn[item] = rn[item].split(',');
+                }
                 if(rn[item]==="undefined"){
                     rn[item] = "";
                 }
@@ -304,6 +317,9 @@ export default{
             return  rnDate;
             // return {y:val.getFullYear,m:val.getMonth()+1,D:val.getDate()};
             
+        },
+        resetData(){
+
         }
     }
 }

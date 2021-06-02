@@ -229,7 +229,7 @@
 <script>
 // import { fetchData,setNewData } from "../api/index";
 import {addDate,deltDate,fetchData,setNewData,downDate,loadDateFromExcel} from "../api/index";
-import {formList,dateTranfer,listMap} from "../api/formDate.js"
+import {getFormList,dateTranfer,listMap} from "../api/formDate.js"
 // 
 // import el_dialog from "../components/el_dialog.vue"
 import searchForm from "../components/searchForm.vue"
@@ -351,9 +351,9 @@ export default {
         };
     },
     created() {
-        // console.log('createBaseTable')
+        console.log('createBaseTable')
         this.getData();
-        this. formList = formList;
+        this. formList = getFormList();
 
 
         this.listTitle = Object.keys(listMap);
