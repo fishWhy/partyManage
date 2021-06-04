@@ -16,7 +16,7 @@
                     <el-container class="inforContainer" style="border-top: 1px solid black;">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;" >基本信息</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="disabled" ref="tableDetail"></table-detail>
+                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="disabled" ref="tableDetail" @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -24,7 +24,7 @@
                     <el-container class="inforContainer">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;">申请入党阶段</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="applyStage" :content="applyContent" :disabled="disabled" ref="applyStage"></table-detail>
+                            <table-detail  :formObj="applyStage" :content="applyContent" :disabled="disabled" ref="applyStage"  @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -32,7 +32,7 @@
                     <el-container class="inforContainer">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;">入党积极分子的确定和培养阶段</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="actvStage" :content="actvStageContent" :disabled="disabled" ref="actvStage"></table-detail>
+                            <table-detail  :formObj="actvStage" :content="actvStageContent" :disabled="disabled" ref="actvStage"  @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -40,7 +40,7 @@
                     <el-container class="inforContainer">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;">发展对象的确定和考察阶段</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="devStage" :content="devStageContent" :disabled="disabled" ref="devStage"></table-detail>
+                            <table-detail  :formObj="devStage" :content="devStageContent" :disabled="disabled" ref="devStage"  @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -48,7 +48,7 @@
                     <el-container class="inforContainer">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;">预备党员的接收阶段</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="candidateStage" :content="candidateContent" :disabled="disabled" ref="candidateStage"></table-detail>
+                            <table-detail  :formObj="candidateStage" :content="candidateContent" :disabled="disabled" ref="candidateStage"  @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -56,7 +56,7 @@
                     <el-container class="inforContainer">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;">预备党员的教育考察和转正阶段</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="positiveStage" :content="positiveContent" :disabled="disabled" ref="positiveStage"></table-detail>
+                            <table-detail  :formObj="positiveStage" :content="positiveContent" :disabled="disabled" ref="positiveStage"  @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -106,6 +106,53 @@ export default {
             if(newValue){
                this.resetData();
             }
+        },
+        redLabel(newValue){
+            let item="";
+            for(let i=0;i<this.applyStage.length;i++){
+                item = this.applyStage[i];
+                if(newValue[item.prop]){
+                    this.applyStage[i].redLabel = true;
+                }else{
+                    this.applyStage[i].redLabel = false;
+                }
+            }
+
+            for(let i=0;i<this.actvStage.length;i++){
+                item = this.actvStage[i];
+                if(newValue[item.prop]){
+                    this.actvStage[i].redLabel = true;
+                }else{
+                    this.actvStage[i].redLabel = false;
+                }
+            }
+
+            for(let i=0;i<this.devStage.length;i++){
+                item = this.devStage[i];
+                if(newValue[item.prop]){
+                    this.devStage[i].redLabel = true;
+                }else{
+                    this.devStage[i].redLabel = false;
+                }
+            }
+            for(let i=0;i<this.candidateStage.length;i++){
+                item = this.candidateStage[i];
+                if(newValue[item.prop]){
+                    this.candidateStage[i].redLabel = true;
+                }else{
+                    this.candidateStage[i].redLabel = false;
+                }
+            }
+            for(let i=0;i<this.positiveStage.length;i++){
+                item = this.positiveStage[i];
+                if(newValue[item.prop]){
+                    this.positiveStage[i].redLabel = true;
+                }else{
+                    this.positiveStage[i].redLabel = false;
+                }
+            }
+
+
         }
     },
     created(){
@@ -186,9 +233,13 @@ export default {
         
         
     },
+    mounted(){
+        this.markLabel();
+    },
 
     data() {
         return {
+            redLabel:{},
             path:'',
             disabled:true,
             status:0,
@@ -257,26 +308,6 @@ export default {
             str += this.checkTime(nData);
 
 
-            //判断，申请入党时间 与 确定积极分子时间 相差6个月以上， 入党时间是否与 确定积极分子时间 相差6个月
-            let applyTime = this.$refs.applyStage.getYMRDate('applyTime'); 
-            let actvTime = this.$refs.actvStage.getYMRDate("actvTime");
-            let jnTime = this.$refs.candidateStage.getYMRDate("jnTime");
-            // console.log('applyTime:',applyTime);
-            // console.log('actvTime:',actvTime);
-            // console.log('jinTime:',jnTime);
-            if(applyTime&&actvTime&&!this.isDateBigM(applyTime,actvTime,6)){
-                str += '申请入党时间与确定积极分子时间必须相差<span style="color:red;">6个月以上</span>;'
-                // this.$message({type:'error',message:'申请入党时间与确定积极分子时间必须相差6个月以上，请改正'});
-                // return;
-            }
-            if(actvTime&&jnTime&&!this.isDateBigM(actvTime,jnTime,12)){
-                str +='确定积极分子时间与入党时间必须相差<span style="color:red;">1年以上</span>';
-                // this.$message({type:'error',message:'确定积极分子时间与入党时间必须相差1年以上，请改正'});
-                // return;
-            }
-
-
-
             try{
                 await  this.$confirm(`确定要保存吗？红色表示时间顺序或间隔不正确${str}`, "提示", {
                             type: "warning",
@@ -326,6 +357,8 @@ export default {
         // 检查表单中日期的前后关系是否正确，返回字符串，前后日期不正确的 会用<span style='color:red;'></span>标签包裹起来
         checkTime(_data){
             console.log('_data:',_data);
+
+            // 检查时间顺序是否正确
             // arrTime中对象属性的顺序表示了时间之间的前后关系。
             // 除了  外调材料日期 与 政审材料日期 这两个属性的日期可以是同一天，其他的均是后面属性的日期要在在前面属性的日期的后面
             let arrTime = {applyTime:'申请入党时间',talkTime:'谈心谈话时间',electLeagueTime:'团推优时间',
@@ -338,18 +371,27 @@ export default {
 
             let keys = Object.keys(arrTime);
             let objWrong = {};
+            this.redLabel = {};
             keys.forEach(item=>{
                 objWrong[item] = false;
+                this.redLabel[item] = false;
             });
+            // 检查时间间隔是否正确
+            this.redLabel.applyTime = false;
+            this.redLabel.actvTime = false;
+            this.redLabel.devTime = false;
+            this.redLabel.jnTime = false;
 
             for(let i=1;i<keys.length;i++){
                 let key1 = keys[i-1], key2 = keys[i];
                 let data1 = _data[key1], data2 = _data[key2];
                 if(data1===""){
                     objWrong[key1] = true;
+                    this.redLabel[key1] = true;
                 }
                 if(data2===""){
                     objWrong[key2] = true;
+                    this.redLabel[key1] = true;
                 }
                 if(data1==="" || data2===""){
                     continue;
@@ -359,26 +401,36 @@ export default {
                     if(data1[1]>=data2[0]){
                         objWrong[key1] = true;
                         objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
                     }
                 }else if(data1 instanceof Array){
                     if(data1[1]>=data2){
                         objWrong[key1] = true;
                         objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
                     }
                 } else if(data2 instanceof Array){
                     if(data1>=data2[0]){
                         objWrong[key1] = true;
                         objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
                     }
                 }else if(key1 == 'extFileTime' && key2 =='polFileTime'){// 这两个日期之间可以相等
                     if(data1>data2){
                         objWrong[key1] = true;
                         objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
                     }
                 }else if(data1>=data2){
                         // console.log('key:',key1,key2);
                         objWrong[key1] = true;
                         objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
                 }
             }
 
@@ -401,7 +453,35 @@ export default {
 
             }
             rn += "<br/>"
-            // console.log('checkTime:',rn);
+
+            
+            //判断，申请入党时间 与 确定积极分子时间 相差6个月以上，确定积极分子时间与确定发展对象时间相差1年, 入党时间与确定发展对象时间 相差1年
+            let applyTime = this.$refs.applyStage.getYMRDate('applyTime'); 
+            let actvTime = this.$refs.actvStage.getYMRDate("actvTime");
+            let devTime = this.$refs.devStage.getYMRDate('devTime');
+            let jnTime = this.$refs.candidateStage.getYMRDate("jnTime");
+
+            if(applyTime&&actvTime&&!this.isDateBigM(applyTime,actvTime,6)){
+                rn += '申请入党时间与确定积极分子时间必须相差<span style="color:red;">6个月以上</span>;'
+                this.redLabel.applyTime = true;
+                this.redLabel.actvTime = true;
+                // this.$message({type:'error',message:'申请入党时间与确定积极分子时间必须相差6个月以上，请改正'});
+                // return;
+            }
+            if(actvTime&&devTime&&!this.isDateBigM(actvTime,devTime,12)){
+                rn +='确定积极分子时间与确定发展对象时间必须相差<span style="color:red;">1年以上</span>;';
+                this.redLabel.actvTime = true;
+                this.redLabel.devTime = true;
+                // this.$message({type:'error',message:'确定积极分子时间与确定发展对象时间必须相差1年以上，请改正'});
+                // return;
+            }
+            if(devTime&&jnTime&&!this.isDateBigM(devTime,jnTime,12)){
+                this.redLabel.devTime = true;
+                this.redLabel.jnTime = true;
+                rn +='确定发展对象时间与入党时间必须相差<span style="color:red;">1年以上</span><br/>';
+                // this.$message({type:'error',message:'确定发展对象时间与入党时间必须相差1年以上，请改正'});
+                // return;
+            }
 
             return rn;
         },
@@ -436,6 +516,11 @@ export default {
                 return false;
             }
             // return true;
+        },
+        markLabel(){
+            let nData = this.getDateFromTableForm();
+            this.checkTime(nData);
+            // console.log('labelRed:',this.redLabel);
         }
 
     }

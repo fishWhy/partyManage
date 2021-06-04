@@ -28,7 +28,7 @@
                     v-if="item.type==='YMArea'"
                     v-model="query[item.prop]"
                     type="monthrange"
-                    align="right"
+                    align="left"
                     unlink-panels
                     range-separator="至"
                     start-placeholder="开始月份"

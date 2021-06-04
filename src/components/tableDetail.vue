@@ -6,76 +6,80 @@
 
         <el-form  style="padding: 4px 0 0 5px;"  label-position="right" label-width="160px" id="selectForm" :inline="true" >
             
-            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea'}">
-              
-               <!-- 输入框 Input -->
-                <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" ></el-input>
-                <!-- 输入框 textarea -->
-                <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" :disabled="disabled" v-model="dateItems[item.prop]"></el-input>
-                
-                <!-- 下拉框 -->
-                <el-select v-if="item.type==='Select'" v-model="dateItems[item.prop]"   :disabled="disabled"  :class="{el_side_style: !item.styleObj}"  :style = "[item.styleObj]">
-                    <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-option>
-                </el-select>   
-                <!-- 年月日 -->
-                <el-date-picker  v-if="item.type==='YMR'" :default-value="item.default_time" v-model="dateItems[item.prop]" :disabled="disabled" style="width:130px;font-size:smaller" class="el_side_style"></el-date-picker>
-                <!-- 年月 -->
-                <el-date-picker
-                  v-if="item.type==='YM'"
-                  v-model="dateItems[item.prop]"
-                  type="month"
-                  placeholder="选择月"
-                  :disabled="disabled"
-                  style="width:120px;font-size:smaller" class="el_side_style"
-                  >
-                </el-date-picker>
+            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
+                <div style="display:inline-block;width:130px;">
+                    <!-- 输入框 Input -->
+                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" ></el-input>
+                    <!-- 输入框 textarea -->
+                    <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" :disabled="disabled" v-model="dateItems[item.prop]"></el-input>
 
-                <!-- 年月日选择区间 -->
-                <el-date-picker
-                    v-if="item.type==='YMDArea'"
-                    v-model="dateItems[item.prop]"
-                    type="daterange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    :disabled="disabled"
-                    style="width:200px;font-size:smaller" class="el_side_style">
-                </el-date-picker>
+                    <!-- 下拉框 -->
+                    <el-select v-if="item.type==='Select'" v-model="dateItems[item.prop]"   :disabled="disabled"  :class="{el_side_style: !item.styleObj}"  :style = "[item.styleObj]">
+                        <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-option>
+                    </el-select>   
+                    <!-- 年月日 -->
+                    <el-date-picker  v-if="item.type==='YMR'" :default-value="item.default_time" v-model="dateItems[item.prop]" :disabled="disabled" style="width:130px;font-size:smaller" class="el_side_style" @change="changeDate"></el-date-picker>
+                    <!-- 年月 -->
+                    <el-date-picker
+                      v-if="item.type==='YM'"
+                      v-model="dateItems[item.prop]"
+                      type="month"
+                      placeholder="选择月"
+                      :disabled="disabled"
+                      @change="changeDate"
+                      style="width:120px;font-size:smaller" class="el_side_style"
+                      >
+                    </el-date-picker>
 
-                <!-- 月份选择区间    -->
-                <el-date-picker
-                    v-if="item.type==='YMArea'"
-                    v-model="dateItems[item.prop]"
-                    type="monthrange"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始月份"
-                    end-placeholder="结束月份"
-                    :shortcuts="shortcuts"
-                    :disabled="disabled"
-                    style="width:130px;font-size:smaller" class="el_side_style"
-                >
-                
+                    <!-- 年月日选择区间 -->
+                    <el-date-picker
+                        v-if="item.type==='YMDArea'"
+                        v-model="dateItems[item.prop]"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        :disabled="disabled"
+                        @change="changeDate"
+                        style="width:200px;font-size:smaller" class="el_side_style">
+                    </el-date-picker>
 
-                </el-date-picker>
+                    <!-- 月份选择区间    -->
+                    <el-date-picker
+                        v-if="item.type==='YMArea'"
+                        v-model="dateItems[item.prop]"
+                        type="monthrange"
+                        align="right"
+                        unlink-panels
+                        range-separator="至"
+                        start-placeholder="开始月份"
+                        end-placeholder="结束月份"
+                        :shortcuts="shortcuts"
+                        :disabled="disabled"
+                        @change="changeDate"
+                        style="width:130px;font-size:smaller" class="el_side_style"
+                    >
 
-                <!-- 省市区三级联动（带"全部"选项） -->
-                <el-cascader
-                    v-if="item.type==='pccA'"
-                    :options="options0"
-                    v-model="dateItems[item.prop]"
-                    :disabled="disabled"
-                    style="width:240px;font-size:12px;" class="el_side_style">
-                </el-cascader>
-                <!-- 省市区三级联动（不带"全部"选项） -->
-                <el-cascader
-                  v-if="item.type==='pcc'"
-                  :options="options1"
-                  v-model="dateItems[item.prop]"
-                  :disabled="disabled"
-                  style="width:240px;font-size:12px;" class="el_side_style">
-                </el-cascader>
+
+                    </el-date-picker>
+
+                    <!-- 省市区三级联动（带"全部"选项） -->
+                    <el-cascader
+                        v-if="item.type==='pccA'"
+                        :options="options0"
+                        v-model="dateItems[item.prop]"
+                        :disabled="disabled"
+                        style="width:240px;font-size:12px;" class="el_side_style">
+                    </el-cascader>
+                    <!-- 省市区三级联动（不带"全部"选项） -->
+                    <el-cascader
+                      v-if="item.type==='pcc'"
+                      :options="options1"
+                      v-model="dateItems[item.prop]"
+                      :disabled="disabled"
+                      style="width:240px;font-size:12px;" class="el_side_style">
+                    </el-cascader>
+                </div>
 
 
             </el-form-item>
@@ -164,6 +168,10 @@ export default{
     computed:{
     },
     methods:{
+        changeDate(){
+            // console.log('changeDate');
+            this.$emit('changeDate');
+        },
         getDate(){
             let rnDate = {};
             let YMR = [], YM = [], YMArea = [], YMDArea = [];
@@ -328,6 +336,9 @@ export default{
 /* 修改 id为filter的header的样式 */
 #selectForm:deep(.el-form-item__label){
     font-size: 12px;
+}
+#selectForm>.itemClass:deep(.el-form-item__label){
+    color: red;
 }
 
 #selectForm{

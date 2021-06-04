@@ -7,7 +7,7 @@
                 :class="{'active': isActive(item.path)}"
                 :key="index"
             >
-                <router-link :to="item.path" class="tags-li-title">{{(item.name=='basetable'||item.name=='baseBranchs')?item.title:item.title+item.path.split('=')[1]}}</router-link>
+                <router-link :to="item.path" class="tags-li-title">{{item.name}}</router-link>
                 <span class="tags-li-icon" @click="closeTags(index)" v-if="item.name!=='basetable'">
                     <i class="el-icon-close"></i>
                 </span>
@@ -34,7 +34,21 @@
 export default {
     computed: {
         tagsList() {
-            return JSON.parse(JSON.stringify(this.$store.state.tagsList));
+            let _list = JSON.parse(JSON.stringify(this.$store.state.tagsList));
+            for(let i=0;i<_list.length;i++){
+                if(_list[i].name=="basetable"){
+                    _list[i].name = "表格"
+                }else if(_list[i].name=="baseBranchs"){
+                    _list[i].name = "支部信息"
+                }else if(_list[i].name=="baseform"){
+                    if(_list[i].path.split('=')[1]=='false'){
+                        _list[i].name = "添加成员"
+                    }else{
+                        _list[i].name = "表单" + _list[i].path.split('=')[1];
+                    }
+                }
+            }
+            return _list;
         },
         showTags() {
             return this.tagsList.length > 0;

@@ -124,7 +124,7 @@
        
 
         <!-- 导入excel -->
-        <el-dialog title="导入Excel" v-model="importVisible" width="30%" >
+        <el-dialog title="导入Excel" v-model="importVisible" width="490px" >
             <div id="elD_314">
                 <div>
                     <el-tag>导入Excel格式要求</el-tag>
@@ -183,7 +183,7 @@
 
 
          <!-- 导出excel -->
-        <el-dialog title="导出Excel" v-model="exportVisible" width="36%" >
+        <el-dialog title="导出Excel" v-model="exportVisible" width="620px" >
             <div >
                 <div  id="transfer314">
                     <div style="text-align:left;margin-bottom:10px;"><el-tag size="medium">导出属性选择</el-tag></div>

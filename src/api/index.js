@@ -3,9 +3,6 @@ import { downLoadExcel,importfxx} from "../utils/excel/upDownExcel.js";
 import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDate} from './formDate.js';
 
 
-
-
-
 /**
  * 
  * @param {请求时的路径} urlL 
@@ -658,6 +655,8 @@ let dataFun = (function(){
                 grade:'18级',//年级
                 tclass:'1903班',//班级
                 proED:'1',//学历
+                stuState:'1',//学籍状态
+                major:'计算机工程',//专业
                 tutor:'张李',//导师
                 stage:'1',//所处阶段
                 jnPartyTime:'',//党员增加时间
@@ -665,7 +664,7 @@ let dataFun = (function(){
                 honour:'东北大学一等奖学金',//个人荣誉
                 bedroom:'3舍A231',//寝室
                 duty:'班长',//职务
-                partyDuty:'支部书记',//党内职务
+                partyDuty:'宣传委员',//党内职务
                 branch:'1',//所在支部
                 
                 pTeacher:'李福',//培养联系人
@@ -726,6 +725,8 @@ let dataFun = (function(){
                 birthday:'19950112',//出生日期
                 grade:'19级',//年级
                 tclass:'1901班',//班级
+                stuState:'2',//学籍状态
+                major:'软件工程',//专业
                 proED:'1',//学历
                 tutor:'张李',//导师
                 stage:'1',//所处阶段
@@ -734,7 +735,7 @@ let dataFun = (function(){
                 honour:'东北大学一等奖学金',//个人荣誉
                 bedroom:'3舍A231',//寝室
                 duty:'班长',//职务
-                partyDuty:'支部书记',//党内职务
+                partyDuty:'组织委员',//党内职务
                 branch:'1',//所在支部
                 
                 pTeacher:'李福',//培养联系人

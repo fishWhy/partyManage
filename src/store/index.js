@@ -26,7 +26,7 @@ export default createStore({
                 .tagsList
                 .push(data);
             // console.log('state tageList length:',state.tagsList.length);
-            // console.log('state.tagesList:',state.tagsList);
+            console.log('state.tagesList:',state.tagsList);
         },
         clearTags(state) {
             state.tagsList = []
