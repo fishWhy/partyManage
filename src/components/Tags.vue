@@ -8,7 +8,7 @@
                 :key="index"
             >
                 <router-link :to="item.path" class="tags-li-title">{{item.name}}</router-link>
-                <span class="tags-li-icon" @click="closeTags(index)" v-if="item.name!=='basetable'">
+                <span class="tags-li-icon" @click="closeTags(index)" v-if="item.name!=='表格'">
                     <i class="el-icon-close"></i>
                 </span>
             </li>

@@ -15,7 +15,7 @@
 
                     <!-- 下拉框 -->
                     <el-select v-if="item.type==='Select'" v-model="dateItems[item.prop]"   :disabled="disabled"  :class="{el_side_style: !item.styleObj}"  :style = "[item.styleObj]">
-                        <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-option>
+                        <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" :class="{el_side_style: !item.styleObj}"></el-option>
                     </el-select>   
                     <!-- 年月日 -->
                     <el-date-picker  v-if="item.type==='YMR'" :default-value="item.default_time" v-model="dateItems[item.prop]" :disabled="disabled" style="width:130px;font-size:smaller" class="el_side_style" @change="changeDate"></el-date-picker>

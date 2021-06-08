@@ -309,10 +309,10 @@ export default {
 
 
             try{
-                await  this.$confirm(`确定要保存吗？红色表示时间顺序或间隔不正确${str}`, "提示", {
-                            type: "warning",
-                            dangerouslyUseHTMLString: true
-                        });
+                await this.$confirm(`确定要保存吗？红色表示时间顺序或间隔不正确${str}`, "提示", {
+                        type: "warning",
+                        dangerouslyUseHTMLString: true
+                });
 
                 
                 
@@ -336,6 +336,7 @@ export default {
 
 
                 this.$message.success(`保存id为 ${nData.stuId} 的同学的信息成功`);
+                this.resetData();
                 
                 this.$store.commit("closeCurrentTag", {
                     $router: this.$router,
@@ -349,7 +350,6 @@ export default {
                
 
             }finally{
-                this.resetData();
                 console.log('the edit data:',nData);
             }
         },

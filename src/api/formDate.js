@@ -3,7 +3,7 @@ import {  CodeToText, TextToCode } from 'element-china-area-data/dist/app.common
 let formDate = {
     gender:{0:'全部',1:'男',2:'女'},
     national:{0:"全部",1:"汉族",2:"蒙古族",3:"回族",4:"藏族",5:"维吾尔族",6:"苗族",7:"彝族",8:"壮族",9:"布依族",10:"朝鲜族",11:"满族",12:"侗族",13:"瑶族",14:"白族",15:"土家族",16:"哈尼族",17:"哈萨克族",18:"傣族",19:"黎族",20:"傈僳族",21:"佤族",22:"畲族",23:"高山族",24:"拉祜族",25:"水族",26:"东乡族",27:"纳西族",28:"景颇族",29:"柯尔克孜族",30:"土族",31:"达斡尔族",32:"仫佬族",33:"羌族",34:"布朗族",35:"撒拉族",36:"毛难族",37:"仡佬族",38:"锡伯族",39:"阿昌族",40:"普米族",41:"塔吉克族",42:"怒族",43:"乌孜别克族",44:"俄罗斯族",45:"鄂温克族",46:"德昂族",47:"保安族",48:"裕固族",49:"京族",50:"塔塔尔族",51:"独龙族",52:"鄂伦春族",53:"赫哲族",54:"门巴族",55:"珞巴族",56:"基诺族",99:"其他"},
-    branch:{0:'全部',1:'第一党支部',2:'第二党支部',3:'第三党支部'},
+    // branch:{0:'全部',1:'第一党支部',2:'第二党支部',3:'第三党支部'},
     addParty:{0:'全部',1:'新发展',2:'自本地(市、州、盟、区)直属的其他单位转入)',3:'自本省(区、市)内的其他地(市、州、盟、区)转入',4:'自本省(区、市)直属的其他单位转入',5:'自本系统内的其他单位转入',6:'自外省(区、市)转入',7:'其他'},
     proED:{0:'全部',1:'本科',2:'硕士研究生',3:'博士研究生',4:'其他'},
     stage:{0:'全部',1:'正式党员',2:'预备党员',3:'入党积极分子',4:'申请入党'},
@@ -15,9 +15,17 @@ let formDate = {
 }
 
 function insertFormDate(attri,obj){
-    formDate[attri] = obj;
-
-    console.log('formDate:',formDate);
+    // console.log('insertFormDate:',obj,typeof obj);
+    if( typeof obj == 'string'){
+        let temptArr = obj.split(','),inObj = {};
+        inObj[0] = "全部";
+        for(let i=0;i<temptArr.length;i++){
+            inObj[i+1] = temptArr[i];
+        }
+        formDate[attri] = inObj;
+        // console.log('formDate:',formDate);
+    }
+    
 }
 
 function inFormToNone(obj){
@@ -74,6 +82,7 @@ function dateTranfer(list){
 // 数组list中的每一项都为一个对象
 function ptdToAddress(list){
     let rs = "";
+    console.log('地址：',CodeToText, TextToCode);
 
     for(let i=0;i<list.length;i++){ 
         //codeArr是一个长度为3的数组分别是省市区的区域码，["130000","130300","130303"]，这里会转成 河北省/秦皇岛市/山海关区
@@ -123,7 +132,6 @@ let baseForm = [
     {label:'学号',prop:'stuId',type:'Input'},
     {label:'性别',prop:'gender',type:'Select',options:[]},
     {label:'民族',prop:'national',type:'Select',options:[]},
-    {label:'支部',prop:'branch',type:'Select',options:[]},
     {label:'学历',prop:'proED',type:'Select',options:[]},
     {label:'年级',prop:'grade',type:'Input'},
     {label:'专业',prop:'major',type:'Input'},
@@ -131,6 +139,8 @@ let baseForm = [
     {label:'导师',prop:'tutor',type:'Input'},
     {label:'所处阶段',prop:'stage',type:'Select',options:[]},
     {label:'学籍状态',prop:'stuState',type:'Select',options:[]},
+    {label:'支部',prop:'branch',type:'Select',options:[],styleObj:{'width':'250px'}},
+
 ];
 
 let applyForm = [
@@ -179,13 +189,13 @@ let tableDetail = [
     {label:'导师',prop:'tutor',type:'Input'},
     {label:'所处阶段',prop:'stage',type:'Select',options:[]},
     {label:'党员增加时间',prop:'jnPartyTime',type:'YMR'},
-    {label:'所在支部',prop:'branch',type:'Select',options:[]},
     {label:'党内职务',prop:'partyDuty',type:'Select',options:[]},
 
 
 
 
     {label:'职务',prop:'duty',type:'Input'},
+    {label:'所在支部',prop:'branch',type:'Select',options:[],styleObj:{'width':'260px'}},
     {label:'党员增加',prop:'addParty',type:'Select',options:[],styleObj:{'width':'340px'}},
 
 
@@ -304,7 +314,7 @@ function getTableForm(){
 }
 
 
-export {getFormList,getTableForm,dateTranfer,inFormToNone,listMap,ptdToAddress,addressToPtd,dateBack,insertFormDate}
+export {getFormList,getTableForm,dateTranfer,inFormToNone,listMap,ptdToAddress,addressToPtd,dateBack,insertFormDate,formDate}
 
 
 var listMap = {

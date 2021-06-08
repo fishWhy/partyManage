@@ -1,6 +1,6 @@
 import request from '../utils/request';
 import { downLoadExcel,importfxx} from "../utils/excel/upDownExcel.js";
-import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDate} from './formDate.js';
+import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDate,formDate} from './formDate.js';
 
 
 /**
@@ -29,6 +29,64 @@ const requestData = (urlL,query, rqType = 'post') => {
 
 //返回处理数据的函数数组，数据以闭包的型式保存。
 let dataFun = (function(){
+    
+    // 将前端数据转变成后端需要的格式
+    function transToBackEnd(dataArr){
+        let list = JSON.parse(JSON.stringify(dataArr));
+        let item;
+        //把list中的每一项转换成字符串
+        for(let i=0;i<list.length;i++){
+            item = list[i];
+            for(let k in item){
+                if(Object.prototype.hasOwnProperty.call(item,k)){
+                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
+                        if(item[k] instanceof Array){
+                            item[k] = item[k].join(',');
+                        }else{
+                            item[k] = '';
+                        }
+
+                    } else if(k==='home'&&(item[k] instanceof Array)){
+                        item[k] = item[k].join(',');
+                    }
+                }
+            }
+        }
+        console.log('list:',list);
+        return list;
+    }
+
+    //将后端数据转换成前端的格式
+    function tranDataToFrontEnd(list){
+        //把list中的actvTrainTime，devTrainTime，pubTime，home转成数组
+        let it;
+        for(let i=0;i<list.length;i++){
+            it = list[i];
+            for(let k in it){
+                if(Object.prototype.hasOwnProperty.call(it,k)){
+                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
+                        if(it[k].length>0 && it[k] instanceof Array){
+                            it[k] = it[k].split(',');
+                        }
+                    }else if(k==="home" && it[k] instanceof Array){
+                        it[k] = it[k].split(',');
+                    }else if(formDate[k]){// 如果是下拉选框，则转成1,2,3的格式
+                        Object.keys(formDate[k]).forEach(eItem=>{
+                            if(formDate[k][eItem]==it[k]){
+                                it[k] = eItem;
+                            }
+                        })  
+                    }
+                }
+            }
+        }
+
+        // 将下拉框选项的数据转成要显示的样式即转成1,2,3
+
+
+        return list;
+    }
+
    
     function getStartDataFromBackend(obj){
         let param = {};
@@ -37,8 +95,7 @@ let dataFun = (function(){
         return requestData('/login',param,'post').then((item)=>{
             console.log('login item:',item);
             data.branchs = item.data.branches;
-            console.log('branch:',item.data.brList)
-            item.data.brList[0] = "全部";
+            console.log('branch:',item.data.brList);
             insertFormDate('branch',item.data.brList);
 
             localStorage.setItem("token", item.data.token);
@@ -46,22 +103,8 @@ let dataFun = (function(){
 
             // 将数据格式转变成前端需要的格式
             let list = JSON.parse(JSON.stringify(item.data.infos.slice(0)));
-            let it;
-            //把list中的actvTrainTime，devTrainTime，pubTime转成数组
-            for(let i=0;i<list.length;i++){
-                it = list[i];
-                for(let k in it){
-                    if(Object.prototype.hasOwnProperty.call(it,k)){
-                        if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
-                            if(it[k].length>0){
-                                it[k] = it[k].split(',');
-                            }
-                        }else if(k==="home"){
-                            it[k] = it[k].split(',');
-                        }
-                    }
-                }
-            }
+           
+            list = tranDataToFrontEnd(list);
             //将获取的数据存储在data.list
             data.list = list;
             console.log('get Data from:',data.list);
@@ -196,31 +239,7 @@ let dataFun = (function(){
         
     }
 
-    // 将数据格式转变成后端需要的格式
-    function transToBackEnd(dataArr){
-        let list = JSON.parse(JSON.stringify(dataArr));
-        let item;
-        //把list中的每一项转换成字符串
-        for(let i=0;i<list.length;i++){
-            item = list[i];
-            for(let k in item){
-                if(Object.prototype.hasOwnProperty.call(item,k)){
-                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
-                        if(item[k] instanceof Array){
-                            item[k] = item[k].join(',');
-                        }else{
-                            item[k] = '';
-                        }
-
-                    } else if(k==='home'&&(item[k] instanceof Array)){
-                        item[k] = item[k].join(',');
-                    }
-                }
-            }
-        }
-        console.log('list:',list);
-        return list;
-    }
+    
 
     //改
     //使用infor对象改变存储在data中的infor.stuId的信息

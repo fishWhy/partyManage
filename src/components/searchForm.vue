@@ -9,7 +9,7 @@
                <!-- 输入框 -->
                 <el-input v-if="item.type==='Input'" v-model="query[item.prop]" class="el_side_style"  ></el-input>
                 <!-- 下拉框 -->
-                <el-select v-if="item.type==='Select'" v-model="query[item.prop]"  class="el_side_style"  >
+                <el-select v-if="item.type==='Select'" v-model="query[item.prop]"  class="el_side_style" :style = "[item.styleObj]" >
                     <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" ></el-option>
                 </el-select>   
                 <!-- 年月日 -->
@@ -213,7 +213,7 @@ export default{
 }
 .el_side_style{
     font-size: smaller;
-    width: 130px !important;
+    width: 130px ;
     margin-top: 0px;
     /* outline: 1px solid red; */
 }

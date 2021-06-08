@@ -104,7 +104,7 @@ export default {
             isLogin:true,
             param: {
                 userName: "00008612",
-                password: "1234561"
+                password: "123456"
             },
             rules: {
                 userName: [
