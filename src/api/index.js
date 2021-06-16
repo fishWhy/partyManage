@@ -65,10 +65,10 @@ let dataFun = (function(){
             for(let k in it){
                 if(Object.prototype.hasOwnProperty.call(it,k)){
                     if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
-                        if(it[k].length>0 && it[k] instanceof Array){
+                        if(it[k].length>0 && typeof it[k] =="string" ){
                             it[k] = it[k].split(',');
                         }
-                    }else if(k==="home" && it[k] instanceof Array){
+                    }else if(k==="home" && typeof it[k] =="string"){
                         it[k] = it[k].split(',');
                     }else if(formDate[k]){// 如果是下拉选框，则转成1,2,3的格式
                         Object.keys(formDate[k]).forEach(eItem=>{
@@ -684,7 +684,8 @@ let dataFun = (function(){
                 bedroom:'3舍A231',//寝室
                 duty:'班长',//职务
                 partyDuty:'宣传委员',//党内职务
-                branch:'1',//所在支部
+                // branch:'1',//所在支部
+                branch:'第一党支部',//所在支部
                 
                 pTeacher:'李福',//培养联系人
                 leader:'上官云',//入党介绍人
@@ -755,8 +756,8 @@ let dataFun = (function(){
                 bedroom:'3舍A231',//寝室
                 duty:'班长',//职务
                 partyDuty:'组织委员',//党内职务
-                branch:'1',//所在支部
-                
+                // branch:'1',//所在支部
+                branch:'第二党支部',//所在支部
                 pTeacher:'李福',//培养联系人
                 leader:'上官云',//入党介绍人
                 applyFileNumber:'13415',//入党志愿书编号
@@ -1149,12 +1150,11 @@ let dataFun = (function(){
             // },
         ],
         branchs:[
-            {id:1,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',leader:'张三'},
-            {id:2,branch:'第二党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',leader:'李四'},
-            {id:3,branch:'第三党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',leader:'王五'},
-            {id:4,branch:'第四党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',leader:'周六'},
-            {id:5,branch:'第五党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',leader:'吴七'},
-
+            {id:1,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'9',leader:'张三'},
+            {id:2,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'6',leader:'李四'},
+            {id:3,branch:'第三党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'王五'},
+            {id:4,branch:'第四党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'周六'},
+            {id:5,branch:'第五党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'12',leader:'吴七'},
         ]
      };
 

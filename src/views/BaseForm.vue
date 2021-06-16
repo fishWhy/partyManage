@@ -82,13 +82,16 @@ export default {
     components:{
         TableDetail:tableDetail
     },
-    actvStage(){
-        console.log('actvStage')
-    },
+    // actvStage(){
+    //     console.log('actvStage')
+    // },
     unmounted(){
         console.log('destroy:',this.path);
         // this.person = {};
 
+    },
+    activated(){
+        console.log('baseForm activated')
     },
     computed:{
         //时刻监听，当前要关闭的页面是否有当前页面
@@ -107,6 +110,9 @@ export default {
             // console.log('outside delTags',newValue,this.path);
             if(newValue){
                this.resetData();
+               console.log('store:',this.$store);
+               //一定要记住在重置数据后，在store.state.dleDeTags中去除一下 this.path
+               this.$store.commit("delDelTags",{path:this.path});
             }
         },
         redLabel(newValue){
@@ -180,9 +186,9 @@ export default {
         }else{
             this.disabled = true;
             this.status = 1;//表示 详情/修改的状态
-            this.person = fetchDataByStuId(this.$route.query.stuId);
+            this.stuId = this.$route.query.stuId;
+            this.person = fetchDataByStuId(this.stuId);
             console.log('person:',this.person);
-
         }
 
         console.log('here get person:',this.person)
@@ -196,54 +202,8 @@ export default {
         this.candidateStage = JSON.parse(JSON.stringify(this.tableForm.candidateStage));// 预备党员的接收阶段
         this.positiveStage = JSON.parse(JSON.stringify(this.tableForm.positiveStage));// 预备党员的教育考察和转正阶段
 
-        //构建表单中要显示的值
-        let atribute = [];
-        this.tableDetail.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.detailContent[item] = this.person[item]
-        })
+        this.setFormData();
 
-        atribute = [];
-        this.applyStage.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.applyContent[item] = this.person[item]
-        })
-
-        atribute = [];
-        this.actvStage.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.actvStageContent[item] = this.person[item]
-        })
-
-        atribute = [];
-        this.devStage.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.devStageContent[item] = this.person[item]
-        })
-
-        atribute = [];
-        this.candidateStage.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.candidateContent[item] = this.person[item]
-        })
-
-        atribute = [];
-        this.positiveStage.forEach(item=>{
-            atribute.push(item.prop);
-        })
-        atribute.forEach(item=>{
-            this.positiveContent[item] = this.person[item]
-        })
         // this.markLabel();
         
         
@@ -255,6 +215,7 @@ export default {
 
     data() {
         return {
+            stuId:'',
             redLabel:{},
             path:'',
             disabled:true,
@@ -281,9 +242,59 @@ export default {
     },
 
     methods: {
+        setFormData(){
+            //构建表单中要显示的值
+            let atribute = [];
+            this.tableDetail.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.detailContent[item] = this.person[item]
+            })
+            
+            atribute = [];
+            this.applyStage.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.applyContent[item] = this.person[item]
+            })
+            
+            atribute = [];
+            this.actvStage.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.actvStageContent[item] = this.person[item]
+            })
+            
+            atribute = [];
+            this.devStage.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.devStageContent[item] = this.person[item]
+            })
+            
+            atribute = [];
+            this.candidateStage.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.candidateContent[item] = this.person[item]
+            })
+            
+            atribute = [];
+            this.positiveStage.forEach(item=>{
+                atribute.push(item.prop);
+            })
+            atribute.forEach(item=>{
+                this.positiveContent[item] = this.person[item]
+            })
+        },
         resetData(){
             if(this.status == 2){
-                console.log('BaseForm:resetData')
+                console.log('BaseForm:resetData at addStatus')
                 this.person = {};
                 this.disabled = false;
                 this.detailContent = {};
@@ -292,10 +303,17 @@ export default {
                 this.devStageContent = {};
                 this.candidateContent = {};
                 this.positiveContent = {};
-                this.$nextTick(()=>{
-                    this.markLabel();
-                })
+
+            }else if(this.status==1){
+                console.log('BaseForm:resetData at editStatus')
+                this.person = fetchDataByStuId(this.stuId);
+                console.log('the person at editStatus:',this.person)
+                this.setFormData();
             }
+
+            this.$nextTick(()=>{
+                this.markLabel();
+            })
            
         },
         getDateFromTableForm(){

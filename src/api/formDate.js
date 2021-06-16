@@ -3,6 +3,7 @@ import {  CodeToText, TextToCode } from 'element-china-area-data/dist/app.common
 let formDate = {
     gender:{0:'全部',1:'男',2:'女'},
     national:{0:"全部",1:"汉族",2:"蒙古族",3:"回族",4:"藏族",5:"维吾尔族",6:"苗族",7:"彝族",8:"壮族",9:"布依族",10:"朝鲜族",11:"满族",12:"侗族",13:"瑶族",14:"白族",15:"土家族",16:"哈尼族",17:"哈萨克族",18:"傣族",19:"黎族",20:"傈僳族",21:"佤族",22:"畲族",23:"高山族",24:"拉祜族",25:"水族",26:"东乡族",27:"纳西族",28:"景颇族",29:"柯尔克孜族",30:"土族",31:"达斡尔族",32:"仫佬族",33:"羌族",34:"布朗族",35:"撒拉族",36:"毛难族",37:"仡佬族",38:"锡伯族",39:"阿昌族",40:"普米族",41:"塔吉克族",42:"怒族",43:"乌孜别克族",44:"俄罗斯族",45:"鄂温克族",46:"德昂族",47:"保安族",48:"裕固族",49:"京族",50:"塔塔尔族",51:"独龙族",52:"鄂伦春族",53:"赫哲族",54:"门巴族",55:"珞巴族",56:"基诺族",99:"其他"},
+    branch:{0:'全部','第一党支部':'第一党支部','第二党支部':'第二党支部','第三党支部':'第三党支部'},
     // branch:{0:'全部',1:'第一党支部',2:'第二党支部',3:'第三党支部'},
     addParty:{0:'全部',1:'新发展',2:'自本地(市、州、盟、区)直属的其他单位转入)',3:'自本省(区、市)内的其他地(市、州、盟、区)转入',4:'自本省(区、市)直属的其他单位转入',5:'自本系统内的其他单位转入',6:'自外省(区、市)转入',7:'其他'},
     proED:{0:'全部',1:'本科',2:'硕士研究生',3:'博士研究生',4:'其他'},
@@ -171,18 +172,18 @@ let partyForm = [
 //基本信息
 let tableDetail = [
     {label:'姓名',prop:'name',type:'Input'},
-    {label:'学号',prop:'stuId',type:'Input'},
+    {label:'性别',prop:'gender',type:'Select',options:[]},
+    {label:'出生日期',prop:'birthday',type:'YMR'},
     {label:'民族',prop:'national',type:'Select',options:[]},
     {label:'籍贯',prop:'home',type:'pcc'},
     {label:'身份证',prop:'idCard',type:'Input'},
-    {label:'出生日期',prop:'birthday',type:'YMR'},
+    {label:'学号',prop:'stuId',type:'Input'},
     {label:'联系方式',prop:'phone',type:'Input'},
     {label:'学历',prop:'proED',type:'Select',options:[]},
     {label:'年级',prop:'grade',type:'Input'},
     {label:'专业',prop:'major',type:'Input'},
     {label:'班级',prop:'tclass',type:'Input'},
     {label:'寝室',prop:'bedroom',type:'Input'},
-    {label:'性别',prop:'gender',type:'Select',options:[]},
     {label:'学籍状态',prop:'stuState',type:'Select',options:[]},
 
 
@@ -215,17 +216,17 @@ let actvStage = [
     {label:'团推优时间',prop:'electLeagueTime',type:'YMR'},
     {label:'确定积极分子时间',prop:'actvTime',type:'YMR'},
     {label:'培养联系人(2人)',prop:'pTeacher',type:'Input'},
-    {label:'积极分子培训班结业情况',prop:'actvTrainResult',type:'Select',options:[]},
     {label:'积极分子培训时间',prop:'actvTrainTime',type:'YMDArea'},
+    {label:'培训班结业情况',prop:'actvTrainResult',type:'Select',options:[]},
 
 ];
 //发展对象的确定和考察阶段
 let devStage = [
     {label:'确定发展对象时间',prop:'devTime',type:'YMR'},
-    {label:'确定发展对象培训结业情况',prop:'devTrainResult',type:'Select',options:[]},                
     {label:'业务课排名',prop:'classRank',type:'Input'},
 
-    {label:'发展对象培训时间',prop:'devTrainTime',type:'YMDArea'},    
+    {label:'发展对象培训时间',prop:'devTrainTime',type:'YMDArea'},  
+    {label:'培训班结业情况',prop:'devTrainResult',type:'Select',options:[]},                
     {label:'外调材料日期',prop:'extFileTime',type:'YMR'},
     {label:'政审材料日期',prop:'polFileTime',type:'YMR'},
     {label:'发展党员上级党委预审日期',prop:'hPartyPreCheckTime',type:'YMR'},
@@ -245,8 +246,8 @@ let candidateStage = [
 ];
 // 预备党员的教育考察和转正阶段`
 let positiveStage = [
-    {label:'转正时间',prop:'confirmTime',type:'YMR'},
     {label:'转正申请书时间',prop:'letterTime',type:'YMR'},
+    {label:'转正时间',prop:'confirmTime',type:'YMR'},
     {label:'转正总支审查日期',prop:'partyConfirmTime',type:'YMR'},
     {label:'转正上级党委审批日期',prop:'hPartyConfirmTime',type:'YMR'},
     {label:'延长预备期日期',prop:'delayReadyTime',type:'YMR'},

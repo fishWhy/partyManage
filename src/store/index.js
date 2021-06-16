@@ -13,6 +13,13 @@ export default createStore({
             state.role.stuId = _role.stuId;
             state.role.role = _role.role;
         },
+        delDelTags(state,data){
+            for(let i=state.delTags.length-1;i>=0;i--){
+                if(state.delTags[i].path == data.path){
+                    state.delTags.splice(i,1);
+                }
+            }
+        },
         delTagsItem(state, data) {
             let delt = state
                 .tagsList

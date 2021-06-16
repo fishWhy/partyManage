@@ -7,7 +7,7 @@
         <el-form  style="padding: 4px 0 0 5px;"  label-position="right" label-width="160px" id="selectForm" :inline="true" >
             
             <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
-                <div style="display:inline-block;width:130px;">
+                <div style="display:inline-block;width:160px;">
                     <!-- 输入框 Input -->
                     <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" @change="changeDate"></el-input>
                     <!-- 输入框 textarea -->
@@ -131,10 +131,14 @@ export default{
         // console.log('dateItems',this.dateItems);
     },
     watch:{
-        content(newVale){
-            // console.log('change tableDetail:',newVale)
-            this.dateItems = JSON.parse(JSON.stringify(newVale));
+        content:{
+            deep:true,
+            handler:function(newVale){
+                console.log('change tableDetail:',newVale)
+                this.dateItems = JSON.parse(JSON.stringify(newVale));
+            }
         }
+
     },
 
     data(){

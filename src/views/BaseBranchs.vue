@@ -73,6 +73,12 @@
                 </el-table-column>
 
                 <el-table-column
+                  prop="applyer"
+                  label="提交申请书"
+                  align="center">
+                </el-table-column>
+
+                <el-table-column
                   prop="leader"
                   label="支部书记"
                   align="center">
@@ -100,9 +106,11 @@ import {getBranchsData} from '../api/index.js'
 export default {
     name: 'baseBranchs',
     created(){
+      console.log('create Branch from Branch')
       this.getData();
     },
     activated(){
+        console.log('getData from Branch')
         this.getData();
     },
     data() {
