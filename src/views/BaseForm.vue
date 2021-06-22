@@ -405,10 +405,21 @@ export default {
             // 除了  外调材料日期 与 政审材料日期 这两个属性的日期可以是同一天，其他的均是后面属性的日期要在在前面属性的日期的后面
             let arrTime = {applyTime:'申请入党时间',talkTime:'谈心谈话时间',electLeagueTime:'团推优时间',
             actvTime:'确定积极分子时间', actvTrainTime:'积极分子培训时间',devTime:'确定发展对象时间',
-            devTrainTime:'发展对象培训时间',extFileTime:'外调材料日期', polFileTime:'政审材料日期',
-            hPartyPreCheckTime:'发展党员上级党委预审日期',pubTime:'公示日期',candidateTime:'拟发展时间',
-            jnTime:'入党时间',aPartyCheckTime:'入党总支审查日期',hPartyTalkTime:'发展党员上级组织谈话日期',
-            hPartyPassTime:'入党上级党委审批日期',confirmTime:'转正时间',partyConfirmTime:'转正总支审查日期',
+            devTrainTime:'发展对象培训时间',
+
+            extFileTime:'外调材料日期', polFileTime:'政审材料日期',
+            hPartyPreCheckTime:'发展党员上级党委预审日期',pubTime:'公示日期',
+            
+            candidateTime:'拟发展时间',
+
+            jnTime:'入党时间',
+            hPartyTalkTime:'发展党员上级组织谈话日期',
+            aPartyCheckTime:'入党总支审查日期',
+            hPartyPassTime:'入党上级党委审批日期',
+
+
+             letterTime:'转正申请书时间',            
+            confirmTime:'转正时间',partyConfirmTime:'转正总支审查日期',
             hPartyConfirmTime:'转正上级党委审批日期'};
 
             let keys = Object.keys(arrTime);
@@ -424,6 +435,7 @@ export default {
             this.redLabel.devTime = false;
             this.redLabel.jnTime = false;
 
+
             for(let i=1;i<keys.length;i++){
                 let key1 = keys[i-1], key2 = keys[i];
                 let data1 = _data[key1], data2 = _data[key2];
@@ -436,6 +448,37 @@ export default {
                     this.redLabel[key1] = true;
                 }
                 if(data1==="" || data2===""){
+                    continue;
+                }
+
+                if(key2=='jnTime'){
+                    // console.log('jnTime:',_data['pubTime'][1],data2)
+                    if(_data['pubTime'][1]>data2){
+                        objWrong['pubTime'] = true;
+                        objWrong[key2] = true;
+                        this.redLabel['pubTime'] = true;
+                        this.redLabel[key2] = true;
+                    }
+                }
+
+                if(key1=='candidateTime'){
+                    // console.log('candidateTime',data1,data2);
+                    if(data1+'00'>data2){
+                        objWrong[key1] = true;
+                        objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
+                    }
+                    continue;
+                }
+                if(key2 == 'candidateTime'){
+                    console.log('candidateTime',data1,data2);
+                    if(data1[1]>data2+'32'){
+                        objWrong[key1] = true;
+                        objWrong[key2] = true;
+                        this.redLabel[key1] = true;
+                        this.redLabel[key2] = true;
+                    }
                     continue;
                 }
                 // console.log('data:',data1,data2);
@@ -501,28 +544,31 @@ export default {
             let applyTime = this.$refs.applyStage.getYMRDate('applyTime'); 
             let actvTime = this.$refs.actvStage.getYMRDate("actvTime");
             let devTime = this.$refs.devStage.getYMRDate('devTime');
+
+            
             let jnTime = this.$refs.candidateStage.getYMRDate("jnTime");
+            let letterTime = this.$refs.positiveStage.getYMRDate("letterTime");
 
 
 
             if(applyTime&&actvTime&&!this.isDateBigM(applyTime,actvTime,6)){
-                rn += '申请入党时间与确定积极分子时间必须相差<span style="color:red;">6个月以上</span>;'
+                rn += '确定积极分子时间需要在申请入党时间<span style="color:red;">6个月之后</span>;'
                 this.redLabel.applyTime = true;
                 this.redLabel.actvTime = true;
                 // this.$message({type:'error',message:'申请入党时间与确定积极分子时间必须相差6个月以上，请改正'});
                 // return;
             }
             if(actvTime&&devTime&&!this.isDateBigM(actvTime,devTime,12)){
-                rn +='确定积极分子时间与确定发展对象时间必须相差<span style="color:red;">1年以上</span>;';
+                rn +='确定发展对象时间需要在确定积极分子时间<span style="color:red;">1年之后</span>;';
                 this.redLabel.actvTime = true;
                 this.redLabel.devTime = true;
                 // this.$message({type:'error',message:'确定积极分子时间与确定发展对象时间必须相差1年以上，请改正'});
                 // return;
             }
-            if(devTime&&jnTime&&!this.isDateBigM(devTime,jnTime,12)){
+            if(jnTime&&letterTime&&!this.isDateBigM(jnTime,letterTime,12)){
                 this.redLabel.devTime = true;
                 this.redLabel.jnTime = true;
-                rn +='确定发展对象时间与入党时间必须相差<span style="color:red;">1年以上</span><br/>';
+                rn +='转正申请书时间需要在入党时间<span style="color:red;">1年之后</span><br/>';
                 // this.$message({type:'error',message:'确定发展对象时间与入党时间必须相差1年以上，请改正'});
                 // return;
             }

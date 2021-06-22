@@ -301,6 +301,22 @@ let dataFun = (function(){
                         if((key==='stuId')&&(String(item[key]).indexOf(query[key])===0)){
                             continue;
                         }
+                        // 对于grade，只要item[key]是以query[key]开头的就行
+                        if((key==='grade')&&(String(item[key]).indexOf(query[key])===0)){
+                            continue;
+                        }
+                        // 对于major，只要item[key]是以query[key]开头的就行
+                        if((key==='major')&&(String(item[key]).indexOf(query[key])===0)){
+                            continue;
+                        }
+                        // 对于tclass，只要item[key]是以query[key]开头的就行
+                        if((key==='tclass')&&(String(item[key]).indexOf(query[key])===0)){
+                            continue;
+                        }
+                        // 对于tutor，只要item[key]是以query[key]开头的就行
+                        if((key==='tutor')&&(String(item[key]).indexOf(query[key])===0)){
+                            continue;
+                        }
                         // console.log('key:',key)
                         //根据item是否存在 申请入党时间 来判断是否申请入党
                         if(key=='isApplay'){
@@ -709,7 +725,7 @@ let dataFun = (function(){
                 classRank:'6',//业务课排名
                 extFileTime:'20210412',//外调材料日期
                 polFileTime:'20210412',//政审材料日期
-                candidateTime:'20210402',//拟发展时间
+                candidateTime:'202104',//拟发展时间
                 hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
                 pubTime:['20180201','20180302'],//公示日期
             
@@ -748,7 +764,7 @@ let dataFun = (function(){
                 stuState:'2',//学籍状态
                 major:'软件工程',//专业
                 proED:'1',//学历
-                tutor:'张李',//导师
+                tutor:'于师傅',//导师
                 stage:'1',//所处阶段
                 jnPartyTime:'20210516',//党员增加时间
                 addParty:'2',//党员增加
@@ -780,7 +796,7 @@ let dataFun = (function(){
                 classRank:'6',//业务课排名
                 extFileTime:'20210412',//外调材料日期
                 polFileTime:'20210412',//政审材料日期
-                candidateTime:'20210402',//拟发展时间
+                candidateTime:'202104',//拟发展时间
                 hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
                 pubTime:['20210201','20210302'],//公示日期
             
@@ -1194,7 +1210,7 @@ var downLoadTemp = {
     grade:'20级',//年级
     tclass:'2001班',//班级
     proED:'1',//学历
-    tutor:'张李',//导师
+    tutor:'于师傅',//导师
     stage:'1',//所处阶段
     jnPartyTime:'20190916',//党员增加时间
     addParty:'2',//党员增加
@@ -1226,7 +1242,7 @@ var downLoadTemp = {
     classRank:'6',//业务课排名
     extFileTime:'20210412',//外调材料日期
     polFileTime:'20210412',//政审材料日期
-    candidateTime:'20210402',//拟发展时间
+    candidateTime:'202104',//拟发展时间
     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
     pubTime:['20210201','20210502'],//公示日期
 

@@ -7,7 +7,7 @@ let formDate = {
     // branch:{0:'全部',1:'第一党支部',2:'第二党支部',3:'第三党支部'},
     addParty:{0:'全部',1:'新发展',2:'自本地(市、州、盟、区)直属的其他单位转入)',3:'自本省(区、市)内的其他地(市、州、盟、区)转入',4:'自本省(区、市)直属的其他单位转入',5:'自本系统内的其他单位转入',6:'自外省(区、市)转入',7:'其他'},
     proED:{0:'全部',1:'本科',2:'硕士研究生',3:'博士研究生',4:'其他'},
-    stage:{0:'全部',1:'正式党员',2:'预备党员',3:'入党积极分子',4:'申请入党',5:'发展对象'},
+    stage:{0:'全部',1:'申请入党',2:'入党积极分子',3:'发展对象',4:'预备党员',5:'正式党员'},
     isApplay:{0:'全部',1:'是',2:'否'},
     actvTrainResult:{0:'全部',1:'通过',2:'不通过'},
     devTrainResult:{0:'全部',1:'通过',2:'不通过'},
@@ -231,7 +231,7 @@ let devStage = [
     {label:'政审材料日期',prop:'polFileTime',type:'YMR'},
     {label:'发展党员上级党委预审日期',prop:'hPartyPreCheckTime',type:'YMR'},
     {label:'公示日期',prop:'pubTime',type:'YMDArea'},
-    {label:'拟发展时间',prop:'candidateTime',type:'YMR'},
+    {label:'拟发展时间',prop:'candidateTime',type:'YM'},
 
 ];
 // 预备党员的接收阶段
@@ -239,8 +239,8 @@ let candidateStage = [
     {label:'入党介绍人（2人）',prop:'leader',type:'Input'},
     {label:'入党志愿书编号',prop:'applyFileNumber',type:'Input'},
     {label:'入党时间',prop:'jnTime',type:'YMR'},
-    {label:'入党总支审查日期',prop:'aPartyCheckTime',type:'YMR'},
     {label:'发展党员上级组织谈话日期',prop:'hPartyTalkTime',type:'YMR'},
+    {label:'入党总支审查日期',prop:'aPartyCheckTime',type:'YMR'},
     {label:'入党上级党委审批日期',prop:'hPartyPassTime',type:'YMR'},
 
 ];
@@ -250,6 +250,7 @@ let positiveStage = [
     {label:'转正时间',prop:'confirmTime',type:'YMR'},
     {label:'转正总支审查日期',prop:'partyConfirmTime',type:'YMR'},
     {label:'转正上级党委审批日期',prop:'hPartyConfirmTime',type:'YMR'},
+    {type:'br'},
     {label:'延长预备期日期',prop:'delayReadyTime',type:'YMR'},
     {label:'延长预备期总支审查日期',prop:'delayCheckTime',type:'YMR'},
     {label:'延长预备期党委审批日期',prop:'delayConfirmTime',type:'YMR'},

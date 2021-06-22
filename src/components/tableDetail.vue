@@ -8,6 +8,7 @@
             
             <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
                 <div style="display:inline-block;width:160px;">
+                    <br v-if="item.type==='br'"/>
                     <!-- 输入框 Input -->
                     <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" @change="changeDate"></el-input>
                     <!-- 输入框 textarea -->

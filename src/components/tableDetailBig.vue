@@ -7,6 +7,7 @@
         <el-form  style="padding: 4px 0 0 5px;"  label-position="right" label-width="190px" id="selectForm" :inline="true" >
             <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop' style="margin-top:6px;" :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
                 <div style="display:inline-block;width:180px;">
+                    <br v-if="item.type==='br'"/>
                     <!-- 输入框 -->
                     <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" disabled="true" ></el-input>
                      <!-- 输入框 textarea -->
