@@ -228,7 +228,7 @@
 
 <script>
 // import { fetchData,setNewData } from "../api/index";
-import {addDate,deltDate,fetchData,setNewData,downDate,loadDateFromExcel} from "../api/index";
+import {addDate,deltDate,fetchData,setNewData,downDate,loadDateFromExcel,getStartDataFromBackend} from "../api/index";
 import {getFormList,dateTranfer,listMap} from "../api/formDate.js"
 // 
 // import el_dialog from "../components/el_dialog.vue"
@@ -351,24 +351,31 @@ export default {
         };
     },
     created() {
-        console.log('createBaseTable')
-        this.getData();
-        this. formList = getFormList();
+        console.log('createBaseTable');
+        getStartDataFromBackend().then(()=>{
+            this.getData();
+            this. formList = getFormList();
+            console.log("formList:",this.formList);
 
 
-        this.listTitle = Object.keys(listMap);
+            this.listTitle = Object.keys(listMap);
 
-        let obj = {};
-        
-        this.listTitle.forEach(item=>{
-            this.tableTitle.push(listMap[item]);
-            
-            obj = {};
-            obj.key = item;
-            obj.label = listMap[item];
-            this.baseTransfer.push(obj);
+            let obj = {};
+
+            this.listTitle.forEach(item=>{
+                this.tableTitle.push(listMap[item]);
+
+                obj = {};
+                obj.key = item;
+                obj.label = listMap[item];
+                this.baseTransfer.push(obj);
+            });
+            this.transferData = this.attriShow;
+
         });
-        this.transferData = this.attriShow;
+
+
+        
 
 
         
@@ -690,6 +697,7 @@ export default {
                     }else {
                         await addDate(tableArray);
                     }
+                    this. formList = getFormList();
 
                     
 

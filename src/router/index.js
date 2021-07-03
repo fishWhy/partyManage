@@ -186,7 +186,7 @@ router.beforeEach((to, from, next) => {
     // }else{
     //     next();
     // }
-    // console.log('from:',from);
+    console.log('from:',from);
     // console.log('to:',to);
     // console.log(vuex.state);
 

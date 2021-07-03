@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import {getStartDataFromBackend,changePsw} from '../api/index.js'
+import {logIn,changePsw} from '../api/index.js'
 export default {
     data() {
         return {
@@ -160,7 +160,7 @@ export default {
                     // });
                     
 
-                    getStartDataFromBackend(this.param).then((duty)=>{
+                    logIn(this.param).then((duty)=>{
                         // this.$router.push("/home/table");
                         let stuId = this.param.userName
                         if(duty>1){

@@ -13,6 +13,7 @@ export default createStore({
             state.role.stuId = _role.stuId;
             state.role.role = _role.role;
         },
+        clearAllRole(){},
         delDelTags(state,data){
             for(let i=state.delTags.length-1;i>=0;i--){
                 if(state.delTags[i].path == data.path){

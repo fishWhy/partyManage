@@ -18,7 +18,7 @@ import {ptdToAddress,dateTranfer,addressToPtd,dateBack} from './formDate.js';
  * @param {请求方式，有get,push,post,delete} rqType 
  * @returns 
  */
-const requestData = (urlL,query, rqType = 'post') => {
+const requestData = (urlL,query="", rqType = 'post') => {
     console.log(urlL,rqType,query);
     return request({
         url: urlL,

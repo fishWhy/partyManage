@@ -353,7 +353,6 @@ export default {
                 });
 
                 
-                
                 // console.log('nData',nData);
                 if(!nData.stuId||!nData.name||!nData.birthday||!nData.applyTime){
                     this.$message({type:'error',message:'学号、姓名、生日、申请入党时间必须添加'});

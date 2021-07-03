@@ -76,7 +76,7 @@ let dataFun = (function(){
                                 it[k] = eItem;
                             }
                         })  
-                    }
+                    } 
                 }
             }
         }
@@ -87,19 +87,29 @@ let dataFun = (function(){
         return list;
     }
 
-   
-    function getStartDataFromBackend(obj){
+    function logIn(obj){
+        localStorage.clear(); 
         let param = {};
         param.userName = obj.userName;
         param.password = obj.password;
         return requestData('/login',param,'post').then((item)=>{
             console.log('login item:',item);
+            
+            localStorage.setItem("token", item.data.token);
+            localStorage.setItem("stuId", item.data.user.stu_id);
+            console.log('token:',localStorage.token,localStorage.stuId);
+
+            return item.data.duty;
+        },()=>{throw new Error("登录失败,请输入正确的账号密码重新登录")});
+    }
+   
+    function getStartDataFromBackend(){
+        return requestData('/refresh',{},'post').then((item)=>{
+            console.log('get data from backend item:',item);
             data.branchs = item.data.branches;
             console.log('branch:',item.data.brList);
             insertFormDate('branch',item.data.brList);
 
-            localStorage.setItem("token", item.data.token);
-            localStorage.setItem("stuId", item.data.user.stu_id);
 
             // 将数据格式转变成前端需要的格式
             let list = JSON.parse(JSON.stringify(item.data.infos.slice(0)));
@@ -187,20 +197,25 @@ let dataFun = (function(){
             
 
             requestData('/updateAll',list,'post').then((item)=>{
-                console.log("updateAll item:",item)
-                //删除返回的代表不被允许（周岁小于18岁）添加进数据库的failedList数组中的stuId，
-                let failArr = {};
-                item.failedList.forEach(v=>{
-                    failArr[v] = true;
-                });
-                for(let i= dataArr.length - 1;i>=0;i--){
-                    if(failArr[dataArr[i].stuId]){
-                        dataArr.splice(i,1);
-                    }
-                }
+                console.log("updateAll item:",item);
+                insertFormDate('branch',item.data.brList);
+                data.list = tranDataToFrontEnd(item.data.infos);
+                data.branchs = item.data.branches;
 
-                data.list = data.list.concat(dataArr);
-                data.list = arrAttrUni(data.list);
+                //删除返回的代表不被允许（周岁小于18岁）添加进数据库的failedList数组中的stuId，
+                // let failArr = {};
+                // item.failedList.forEach(v=>{
+                //     failArr[v] = true;
+                // });
+
+                // for(let i= dataArr.length - 1;i>=0;i--){
+                //     if(failArr[dataArr[i].stuId]){
+                //         dataArr.splice(i,1);
+                //     }
+                // }
+
+                // data.list = data.list.concat(dataArr);
+                // data.list = arrAttrUni(data.list);
                 // console.log('data_list:',data.list);
                 resolve('202');
             },item=>{
@@ -623,7 +638,7 @@ let dataFun = (function(){
             try{
                 _data = await importfxx(fileList[i].raw, filesObj.listTitle,filesObj.tableTitle);
                 
-                // console.log("beforeStyle:",_data)
+                console.log("beforeStyle:",_data)
                 _data = loadDateStyle(_data);
                 // console.log("afterStyle:",_data);
                 tableArray = tableArray.concat(_data);
@@ -1180,7 +1195,7 @@ let dataFun = (function(){
     // }
 
     return [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,
-        getBranchsData,changePsw];
+        getBranchsData,changePsw,logIn];
 
 
 
@@ -1190,10 +1205,10 @@ let dataFun = (function(){
 
 })();
 
-let [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,getBranchsData,changePsw] = [...dataFun];
+let [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,getBranchsData,changePsw,logIn] = [...dataFun];
 
 
-export {addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,requestData,getStartDataFromBackend,getBranchsData,changePsw}
+export {addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,requestData,getStartDataFromBackend,getBranchsData,changePsw,logIn}
 
 
 
