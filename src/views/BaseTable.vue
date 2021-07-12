@@ -134,25 +134,18 @@
                          <el-button type="danger" icon="el-icon-download" @click="getExcelTemplate" size="mini">模板下载</el-button>
                     </div>
                 </div>
-                <div style="margin-top:20px">
+                <div style="margin-top:20px;">
                     <div  style="margin-bottom:10px"><el-tag>导入Excel文件</el-tag></div>
-                    <el-radio v-model="impExcel" label="2" border>添加更新数据</el-radio>
-                    <el-radio v-model="impExcel" label="1" border>替换数据</el-radio>
-                    <div style="margin: 10px 0 10px 0" >
-                        <span v-show="!impExcel||impExcel=='1'">导入新的Excel替换拥有相同学号的同学的数据</span>
-                        <span v-show="impExcel=='2'">导入Excel添加新数据或更新具有相同学号的同学的数据</span>
-                    </div>
-                    
+
                     <el-upload
                         class="upload-demo"
                         action=""
                         :on-change="handleExcelChange"
                         :before-remove="handleBeforeRemove"
                         :on-remove = "handleExcelRemove"
-                        :on-exceed="handleExcelExceed"
-                        :limit="impExcel==='1'?1:1000"
-                        :multiple="impExcel==='1'?false:true"
-                        :file-list="fileListUpload"
+                        :multiple="false"
+                        :file-list="fileList"
+                        :show-file-list="true"
                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                         :auto-upload="false"
                         id="el_upload_314"
@@ -160,9 +153,8 @@
                         <el-button size="small" type="primary" icon="el-icon-upload">点击导入excel</el-button>
                         
                         <template #tip>
-                            <div  class="el-upload__tip">
-                                <span>最 多只 能 上 传{{impExcel==='1'?1:1000}}个xlsx/xls文 件</span>
-                                <el-button style="margin-left:30px" @click="deleteAllUpload" type="danger" size="mini">清除已上传文件列表</el-button>
+                            <div class="el-upload__tip">
+                                <span>最多只能上传1个xlsx/xls文 件</span>
                             </div>
                             
                         </template>
@@ -228,7 +220,7 @@
 
 <script>
 // import { fetchData,setNewData } from "../api/index";
-import {addDate,deltDate,fetchData,setNewData,downDate,loadDateFromExcel,getStartDataFromBackend} from "../api/index";
+import {addDate,deltDate,fetchData,downDate,loadDateFromExcel,getStartDataFromBackend} from "../api/index";
 import {getFormList,dateTranfer,listMap} from "../api/formDate.js"
 // 
 // import el_dialog from "../components/el_dialog.vue"
@@ -321,7 +313,6 @@ export default {
 
             //导入Excel
             importVisible: false,
-            impExcel: '2',
             // maxNumFile:10,
 
             
@@ -352,6 +343,7 @@ export default {
     },
     created() {
         console.log('createBaseTable');
+        this. formList = getFormList();
         getStartDataFromBackend().then(()=>{
             this.getData();
             this. formList = getFormList();
@@ -391,12 +383,6 @@ export default {
     //         return this.tableData.length;
     //     }
     // },
-    watch:{
-        impExcel(){
-            this.$refs.el_upload_314.clearFiles();
-            this.fileList = null;
-        },
-    },
     methods: {
         // 获取 easy-mock 的模拟数据
         async getData(searchObj = this.query) {
@@ -658,8 +644,8 @@ export default {
 
         //导入excel
         handleExcelChange(_,fileList){
-            this.fileList = fileList;
-            console.log('fileListUped',this.fileList);
+            let _file = fileList[fileList.length-1];
+            this.fileList[0] = _file;
         },
         handleBeforeRemove(file){
             return this.$confirm(`确定移除 ${ file.name }？`);
@@ -669,11 +655,6 @@ export default {
             this.$message.success(`移除了文件 ${ file.name }`)
             this.fileList = fileList;
             console.log('fileList',this.fileList.length);
-        },
-        handleExcelExceed(files,fileList){
-            // console.log('handleExcelExceed')
-            this.$message.warning(`当前限制选择 ${this.impExcel==='1'?1:1000} 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
-        
         },
         async  saveUploadExcel(){
                 if(!this.fileList) return;
@@ -691,15 +672,8 @@ export default {
 
                  
                 try{
-                    if(this.impExcel==='1'){
-                        await setNewData(tableArray);
-
-                    }else {
-                        await addDate(tableArray);
-                    }
+                    await addDate(tableArray);
                     this. formList = getFormList();
-
-                    
 
                     //更新当前页面的内容
                     this.resetQueryData();
@@ -812,9 +786,22 @@ export default {
     padding: 0px;
 }
 
-/* #el_upload_314{
-    width: 220px;
+/* 去除动画效果 ,我特别害怕影响其他vue文件*/
+/* #el_table_314 {
+  display: flex;
 } */
+.el-list-enter-active,
+.el-list-leave-active{
+  transition: none;
+}
+.el-list-enter, .el-list-leave-active{
+  opacity: 0;
+}
+
+ .el-upload-list {
+  height: 40px;
+}
+
 #el_upload_314 .el-upload{
     width: 200px;
     height: 35px;

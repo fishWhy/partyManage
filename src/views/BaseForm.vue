@@ -16,7 +16,7 @@
                     <el-container class="inforContainer" style="border-top: 1px solid black;">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;" >基本信息</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="disabled" ref="tableDetail" @changeDate="markLabel"></table-detail>
+                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="status==2?false:true" ref="tableDetail" @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 
@@ -354,8 +354,8 @@ export default {
 
                 
                 // console.log('nData',nData);
-                if(!nData.stuId||!nData.name||!nData.birthday||!nData.applyTime){
-                    this.$message({type:'error',message:'学号、姓名、生日、申请入党时间必须添加'});
+                if(!nData.stuId||!nData.name||!nData.birthday){
+                    this.$message({type:'error',message:'学号、姓名、出生日期必须添加'});
                     return;
                 }
                 if(this.redLabel.birthday){
@@ -450,6 +450,7 @@ export default {
                     continue;
                 }
 
+                // 入党时间要在公示时间之后，由于这两个时间并不是前后关系，所以这里要特殊处理一下
                 if(key2=='jnTime'){
                     // console.log('jnTime:',_data['pubTime'][1],data2)
                     if(_data['pubTime'][1]>data2){
@@ -460,6 +461,7 @@ export default {
                     }
                 }
 
+                // 由于 拟发展时间是 年月的型式，因此这里需要特别处理一下，判断其与它前后时间的关系
                 if(key1=='candidateTime'){
                     // console.log('candidateTime',data1,data2);
                     if(data1+'00'>data2){
@@ -471,7 +473,7 @@ export default {
                     continue;
                 }
                 if(key2 == 'candidateTime'){
-                    console.log('candidateTime',data1,data2);
+                    // console.log('candidateTime',data1,data2);
                     if(data1[1]>data2+'32'){
                         objWrong[key1] = true;
                         objWrong[key2] = true;
@@ -587,7 +589,6 @@ export default {
             this.redLabel.name = false;
             if(!_data.name){this.redLabel.name = true;}
             if(!_data.birthday){this.redLabel.birthday = true;}
-            if(!_data.applyTime){this.redLabel.applyTime = true;}
 
 
             return rn;

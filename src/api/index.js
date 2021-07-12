@@ -1181,11 +1181,11 @@ let dataFun = (function(){
             // },
         ],
         branchs:[
-            {id:1,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'9',leader:'张三'},
-            {id:2,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'6',leader:'李四'},
-            {id:3,branch:'第三党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'王五'},
-            {id:4,branch:'第四党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'周六'},
-            {id:5,branch:'第五党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'12',leader:'吴七'},
+            // {id:1,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'9',leader:'张三'},
+            // {id:2,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'6',leader:'李四'},
+            // {id:3,branch:'第三党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'王五'},
+            // {id:4,branch:'第四党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'3',leader:'周六'},
+            // {id:5,branch:'第五党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'12',leader:'吴七'},
         ]
      };
 

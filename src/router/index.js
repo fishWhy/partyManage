@@ -7,8 +7,8 @@ import vuex from "../store/index.js"
 const routes = [
     {
         path: '/',
-        redirect: '/login'
-        // redirect: '/home/table'
+        // redirect: '/login'
+        redirect: '/home/table'
         // redirect: "/selfForm",
     }, {
         path: "/home",

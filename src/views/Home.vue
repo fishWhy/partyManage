@@ -7,15 +7,11 @@
             <div class="content">
 
                 <router-view v-slot="{ Component }">
-                    <!-- vue的动画 :key="keyOfRouter"-->
-                    <transition name="move" mode="out-in">
                         <!-- keep-alive保持组件的状态, component为动态组件 :include="tagsList" -->
                         <keep-alive include="basetable,baseform" >
                             <component :is="Component" :key="keyOfRouter"/>
                         </keep-alive>
-                    </transition>
                 </router-view>
-                <!-- <el-backtop target=".content"></el-backtop> -->
             </div>
         </div>
     </div>
