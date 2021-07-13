@@ -173,6 +173,7 @@ export default {
 
         }
     },
+    
     created(){
         console.log('this:',this);
         // console.log('here createBaseForm');
@@ -203,10 +204,6 @@ export default {
         this.positiveStage = JSON.parse(JSON.stringify(this.tableForm.positiveStage));// 预备党员的教育考察和转正阶段
 
         this.setFormData();
-
-        // this.markLabel();
-        
-        
     },
     mounted(){
         console.log('mounted');
@@ -358,10 +355,10 @@ export default {
                     this.$message({type:'error',message:'学号、姓名、出生日期必须添加'});
                     return;
                 }
-                if(this.redLabel.birthday){
-                    this.$message({type:'error',message:'申请入党时必须在18周岁以上'});
-                    return;
-                }
+                // if(this.redLabel.birthday){
+                //     this.$message({type:'error',message:'申请入党时必须在18周岁以上'});
+                //     return;
+                // }
 
                 //将数据提交给后台
                 // this.person = nData;
@@ -583,7 +580,7 @@ export default {
                 rn +='申请入党时必须在<span style="color:red;">18周岁以上,否则不会保存</span><br/>';
             }
 
-            // 检查学号、姓名、生日、申请入党时间不为空
+            // 检查学号、姓名、生日不为空
             this.redLabel.stuId = false;
             if(!_data.stuId){this.redLabel.stuId = true;}
             this.redLabel.name = false;

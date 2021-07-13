@@ -5,26 +5,26 @@
         <!-- <el-divider style="margin: 5px 0 10px 0;"></el-divider> -->
 
         <el-form  style="padding: 4px 0 0 5px;"  label-position="right" label-width="190px" id="selectForm" :inline="true" >
-            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop' style="margin-top:6px;" :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
+            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop' style="margin-top:6px;" :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true,br:item.type==='br'}" >
                 <div style="display:inline-block;width:180px;">
-                    <br v-if="item.type==='br'"/>
                     <!-- 输入框 -->
-                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" disabled="true" ></el-input>
+                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" @change="changeDate"></el-input>
                      <!-- 输入框 textarea -->
-                    <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" disabled="true" v-model="dateItems[item.prop]"></el-input>
+                    <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" :disabled="disabled" v-model="dateItems[item.prop]"></el-input>
                     <!-- 下拉框 -->
-                    <el-select v-if="item.type==='Select'" v-model="dateItems[item.prop]"  :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]" disabled="true">
+                    <el-select v-if="item.type==='Select'" v-model="dateItems[item.prop]"  :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]" :disabled="disabled">
                         <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value" :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-option>
                     </el-select>   
                     <!-- 年月日 -->
-                    <el-date-picker  v-if="item.type==='YMR'" :default-value="item.default_time" v-model="dateItems[item.prop]" disabled="true" style="width:145px;font-size:medium;" class="el_side_style" ></el-date-picker>
+                    <el-date-picker  v-if="item.type==='YMR'" :default-value="item.default_time" v-model="dateItems[item.prop]" :disabled="disabled" style="width:145px;font-size:medium;" class="el_side_style" @change="changeDate"></el-date-picker>
                     <!-- 年月 -->
                     <el-date-picker
                       v-if="item.type==='YM'"
                       v-model="dateItems[item.prop]"
                       type="month"
                       placeholder="选择月"
-                      disabled="true"
+                      :disabled="disabled"
+                      @change="changeDate"
                       style="width:180px;font-size:medium" class="el_side_style"
                       >
                     </el-date-picker>
@@ -37,7 +37,8 @@
                         range-separator="至"
                         start-placeholder="开始日期"
                         end-placeholder="结束日期"
-                        disabled="true"
+                        :disabled="disabled"
+                        @change="changeDate"
                         style="width:180px;font-size:medium" class="el_side_style">
                     </el-date-picker>
 
@@ -52,7 +53,8 @@
                         start-placeholder="开始月份"
                         end-placeholder="结束月份"
                         :shortcuts="shortcuts"
-                        disabled="true"
+                        :disabled="disabled"
+                        @change="changeDate"
                         style="width:180px;font-size:medium" class="el_side_style"
                     >
 
@@ -64,7 +66,7 @@
                         v-if="item.type==='pccA'"
                         :options="options0"
                         v-model="dateItems[item.prop]"
-                        disabled="true"
+                        :disabled="disabled"
                         style="width:240px;font-size:12px;" class="el_side_style">
                     </el-cascader>
                     <!-- 省市区三级联动（不带"全部"选项） -->
@@ -72,7 +74,7 @@
                       v-if="item.type==='pcc'"
                       :options="options1"
                       v-model="dateItems[item.prop]"
-                      disabled="true"
+                      :disabled="disabled"
                       style="width:240px;font-size:12px;" class="el_side_style">
                     </el-cascader>
                 </div>
@@ -127,6 +129,10 @@ export default{
                 return{}
             }
         },
+        disabled:{
+            type:Boolean,
+            default:true
+        }
 
     },
     created(){
@@ -135,6 +141,16 @@ export default{
         // })
         this.dateItems = JSON.parse(JSON.stringify(this.content));
         // console.log('dateItems',this.dateItems);
+    },
+    watch:{
+        content:{
+            deep:true,
+            handler:function(newVale){
+                console.log('change tableDetail:',newVale)
+                this.dateItems = JSON.parse(JSON.stringify(newVale));
+            }
+        }
+
     },
 
     data(){
@@ -169,12 +185,16 @@ export default{
     computed:{
     },
     methods:{
+        changeDate(){
+            // console.log('changeDate');
+            this.$emit('changeDate');
+        },
         getDate(){
             let rnDate = {};
             let YMR = [], YM = [], YMArea = [], YMDArea = [];
             
             Object.keys(this.dateItems).forEach(item=>{
-                if(item!=='YMR'&&item!=='YM'&&item!=='YMArea'&&item!=='YMDArea'){
+                if(item!=='YMR'&&item!=='YM'&&item!=='YMArea'&&item!=='YMDArea' && this.dateItems[item]){
                     rnDate[item] = this.dateItems[item];
                 }else {
                     rnDate[item] = "";
@@ -200,6 +220,10 @@ export default{
                     if(m<=9)m = "0" + m;
                     if(d<=9)d="0"+d;
                     rnDate[item] = y + m + d;
+                }else if(val){
+                    rnDate[item]  = val + ''; 
+                }else{
+                    rnDate[item] = '';
                 }
             });
 
@@ -209,6 +233,10 @@ export default{
                      let y = val.getFullYear(), m=val.getMonth()+1;
                     if(m<=9)m = "0" + m;
                     rnDate[item] = y + m;
+                }else if(val){
+                    rnDate[item]  = val + ''; 
+                }else{
+                    rnDate[item] = '';
                 }
             });
             
@@ -228,6 +256,10 @@ export default{
                     m=val2.getMonth()+1;
                     if(m<=9)m = "0" + m;
                     rnDate[item][1] = y + m + '31';
+                }else if(val){
+                    rnDate[item]  = val + ''; 
+                }else{
+                    rnDate[item] = '';
                 }
             });
 
@@ -246,8 +278,10 @@ export default{
                         if(m<=9)m = "0" + m;
                         if(d<=9)d="0"+d;
                         rnDate[item][0] = y + m + d;
-                    }else {
+                    }else if(val1){
                         rnDate[item][0] = val1;
+                    }else{
+                        rnDate[item][0] = '';
                     }
                     
 
@@ -259,19 +293,32 @@ export default{
                         if(m<=9)m = "0" + m;
                         if(d<=9)d="0"+d;
                         rnDate[item][1] = y + m + d;
-                    }else {
-                        rnDate[item][1] = val2;
+                    }else if(val2){
+                        rnDate[item][1]  = val2 + ''; 
+                    }else{
+                        rnDate[item][1] = '';
                     }
-
                     
+                }else{
+                    rnDate[item] = val + '';
                 }
             });
 
             // 将query中值为0的 下拉框 对应的值由0值，置为''
+            console.log('rnDate:',rnDate);
             inFormToNone(rnDate);
             // console.log('getFormQuery:',rnQuery)
             let rn = JSON.parse(JSON.stringify(rnDate));
             // console.log('tableDetail:',rn);
+
+            Object.keys(rn).forEach(item=>{
+                // if(item=='home'){
+                //     console.log('home',rn[item]);
+                // }
+                if(rn[item]==="undefined"){
+                    rn[item] = "";
+                }
+            })
             return rn;
         },
         //获取属性为attr的关于年月日的数据
@@ -297,6 +344,9 @@ export default{
             return  rnDate;
             // return {y:val.getFullYear,m:val.getMonth()+1,D:val.getDate()};
             
+        },
+        resetData(){
+
         }
     }
 }
@@ -344,6 +394,12 @@ export default{
     display: block;
 }
 
+.br{
+    display: block!important;
+    height: 0px!important;
+    margin-top: 0px!important;
+    margin-bottom: 0px!important;
+}
 
 
 </style>

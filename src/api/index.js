@@ -121,6 +121,21 @@ let dataFun = (function(){
             return item.data.duty;
         });
     }
+
+    //从后台得到studId单个人的信息
+    function getDataOfStuIdFromBN(stuId){
+        return requestData('/personInfor',{stuId:stuId},'post').then((item)=>{
+            console.log('get data from backend item:',item);
+            insertFormDate('branch',item.data.brList);
+
+            // 将数据格式转变成前端需要的格式
+            let list = JSON.parse(JSON.stringify(item.data.infos.slice(0)));
+            list = tranDataToFrontEnd(list);
+
+            console.log('get Data from:',list);
+            return list;
+        });
+    }
     function changePsw(obj){
         let psObj = {};
         psObj.userId = obj.userName;
@@ -1195,7 +1210,7 @@ let dataFun = (function(){
     // }
 
     return [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,
-        getBranchsData,changePsw,logIn];
+        getBranchsData,changePsw,logIn,getDataOfStuIdFromBN];
 
 
 
@@ -1205,10 +1220,10 @@ let dataFun = (function(){
 
 })();
 
-let [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,getBranchsData,changePsw,logIn] = [...dataFun];
+let [addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,getStartDataFromBackend,getBranchsData,changePsw,logIn,getDataOfStuIdFromBN] = [...dataFun];
 
 
-export {addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,requestData,getStartDataFromBackend,getBranchsData,changePsw,logIn}
+export {addDate,deltDate,cInfor,fetchData,setNewData,isInDate,getTitle,downDate,fetchDataByStuId,loadDateFromExcel,requestData,getStartDataFromBackend,getBranchsData,changePsw,logIn,getDataOfStuIdFromBN}
 
 
 

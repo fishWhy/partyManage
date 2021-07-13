@@ -6,7 +6,7 @@
 
         <el-form  style="padding: 4px 0 0 5px;"  label-position="right" label-width="160px" id="selectForm" :inline="true" >
             
-            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true}" >
+            <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop'  size='mini' :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true,br:item.type==='br'}" >
                 <div style="display:inline-block;width:160px;">
                     <br v-if="item.type==='br'"/>
                     <!-- 输入框 Input -->
@@ -305,12 +305,6 @@ export default{
             // console.log('rn:',rn);
 
             Object.keys(rn).forEach(item=>{
-                // if(item=='home'){
-                //     console.log('home',rn[item]);
-                // }
-                if(item ==='home'){
-                    rn[item] = rn[item].split(',');
-                }
                 if(rn[item]==="undefined"){
                     rn[item] = "";
                 }
@@ -390,6 +384,13 @@ export default{
 .blockClass{
     margin-top: 0px;
     display: block;
+}
+
+.br{
+    display: block!important;
+    height: 0px!important;
+    margin-top: 0px!important;
+    margin-bottom: 0px!important;
 }
 /* .el_area_style{
     display: block;

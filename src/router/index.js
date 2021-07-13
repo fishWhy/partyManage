@@ -8,8 +8,8 @@ const routes = [
     {
         path: '/',
         // redirect: '/login'
-        redirect: '/home/table'
-        // redirect: "/selfForm",
+        // redirect: '/home/table'
+        redirect: "/selfForm",
     }, {
         path: "/home",
         name: "Home",

@@ -125,6 +125,7 @@ export default {
             // console.log('router newValue:',newValue);
             // console.log('tagsList:',this.tagsList)
             this.setTags(newValue);
+            console.log('route',newValue);
         }
     },
     created() {
