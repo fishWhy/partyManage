@@ -5,9 +5,9 @@ const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
     // easy-mock服务挂了，暂时不使用了
     // baseURL: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
-    // baseURL:'http://172.22.22.35:8080/api/internal',
+    baseURL:'http://172.22.22.35:8080/api/internal',
     // baseURL:'http://lizhangjie.cn:8080/api/internal',
-    baseURL:'http://localhost:8080/api/internal',
+    // baseURL:'http://localhost:8080/api/internal',
     // baseURL:'http://139.9.131.190:8080/api/internal',
     // headers: {'content-type': 'application/json'},
     // withCredentials: true,
@@ -24,6 +24,7 @@ service.interceptors.request.use(
         if(localStorage.token && localStorage.stuId){
             config.headers.au = localStorage.getItem('token');//将token设置成请求头
             config.headers.id = localStorage.getItem('stuId');
+            config.headers.duty = localStorage.getItem("duty");
             // console.log('config',config);
             // config.headers.content-type = 'application/x-www-form-urlencoded';
         }

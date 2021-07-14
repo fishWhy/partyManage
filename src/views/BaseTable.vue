@@ -221,7 +221,7 @@
 <script>
 // import { fetchData,setNewData } from "../api/index";
 import {addDate,deltDate,fetchData,downDate,loadDateFromExcel,getStartDataFromBackend} from "../api/index";
-import {getFormList,dateTranfer,listMap} from "../api/formDate.js"
+import {getFormList,dateTranfer,listMap,formDate} from "../api/formDate.js"
 // 
 // import el_dialog from "../components/el_dialog.vue"
 import searchForm from "../components/searchForm.vue"
@@ -251,6 +251,7 @@ export default {
         return {
 
             formList: '',
+            formData:'',
             activeName:'apply',
             //筛选/搜索数据时的条件
             query: {
@@ -343,46 +344,38 @@ export default {
     },
     created() {
         console.log('createBaseTable');
-        this. formList = getFormList();
+        this.formList = getFormList();
+        this.formData = formDate;
+        
+        this.listTitle = Object.keys(listMap);
+        let obj = {};
+        this.listTitle.forEach(item=>{
+            this.tableTitle.push(listMap[item]);
+            obj = {};
+            obj.key = item;
+            obj.label = listMap[item];
+            this.baseTransfer.push(obj);
+        });
+        this.transferData = this.attriShow;
+
         getStartDataFromBackend().then(()=>{
             this.getData();
             this. formList = getFormList();
             console.log("formList:",this.formList);
-
-
-            this.listTitle = Object.keys(listMap);
-
-            let obj = {};
-
-            this.listTitle.forEach(item=>{
-                this.tableTitle.push(listMap[item]);
-
-                obj = {};
-                obj.key = item;
-                obj.label = listMap[item];
-                this.baseTransfer.push(obj);
-            });
-            this.transferData = this.attriShow;
-
         });
 
 
-        
-
-
-        
-
-        
-
-        // console.log('CreatlistTitle:',this.listTitle);
-        // console.log('CreattableTitle:',this.tableTitle);
-
     },
-    // computed:{
-    //     itemTotal: function () {
-    //         return this.tableData.length;
-    //     }
-    // },
+    
+    watch:{
+        formData:{
+            handle:function(){
+                this. formList = getFormList();
+            },
+            deep:true
+        }
+    },
+
     methods: {
         // 获取 easy-mock 的模拟数据
         async getData(searchObj = this.query) {
@@ -656,7 +649,7 @@ export default {
             this.fileList = fileList;
             console.log('fileList',this.fileList.length);
         },
-        async  saveUploadExcel(){
+        async saveUploadExcel(){
                 if(!this.fileList) return;
                 // console.log('fileListSaveUploadExcel:',this.fileList);
                 let filesObj = {};
@@ -665,14 +658,18 @@ export default {
                 filesObj.tableTitle= this.tableTitle;
 
                 
-
                 let tableArray = await loadDateFromExcel(filesObj);
                 // console.log('tableArray:',tableArray)
                 
-
-                 
                 try{
-                    await addDate(tableArray);
+                    let resDate = await addDate(tableArray);
+                    console.log("resDate:",resDate);
+                    if(Object.prototype.toString.call(resDate.failList) == "[object Array]" && resDate.failList.length>0){
+                        this.$message({
+                            type:'warning',
+                            message: "学号为"+resDate.failList.join(',')+"的学生信息添加失败"
+                    }   );
+                    }
                     this. formList = getFormList();
 
                     //更新当前页面的内容

@@ -28,7 +28,7 @@
                         <el-container class="inforContainer">
                             <el-header width="80px" class="inforHead"><el-tag type="success" class="tag">申请入党阶段</el-tag></el-header>
                             <el-main class="inforMain">
-                                <table-detail-big  :formObj="applyStage" :content="applyContent"  ref="applyStage" @changeDate="markLabel"></table-detail-big>
+                                <table-detail-big  :formObj="applyStage" :content="applyContent"  ref="applyStage"></table-detail-big>
                             </el-main>
                         </el-container>
 
@@ -36,7 +36,7 @@
                         <el-container class="inforContainer">
                             <el-header width="80px" class="inforHead"><el-tag type="success" class="tag">入党积极分子的确定和培养阶段</el-tag></el-header>
                             <el-main class="inforMain">
-                                <table-detail-big  :formObj="actvStage" :content="actvStageContent"  ref="actvStage" @changeDate="markLabel"></table-detail-big>
+                                <table-detail-big  :formObj="actvStage" :content="actvStageContent"  ref="actvStage"></table-detail-big>
                             </el-main>
                         </el-container>
 
@@ -44,7 +44,7 @@
                         <el-container class="inforContainer">
                             <el-header width="80px" class="inforHead"><el-tag type="success" class="tag">发展对象的确定和考察阶段</el-tag></el-header>
                             <el-main class="inforMain">
-                                <table-detail-big  :formObj="devStage" :content="devStageContent"  ref="devStage" @changeDate="markLabel"></table-detail-big>
+                                <table-detail-big  :formObj="devStage" :content="devStageContent"  ref="devStage"></table-detail-big>
                             </el-main>
                         </el-container>
 
@@ -52,7 +52,7 @@
                         <el-container class="inforContainer">
                             <el-header width="80px" class="inforHead"><el-tag type="success" class="tag">预备党员的接收阶段</el-tag></el-header>
                             <el-main class="inforMain">
-                                <table-detail-big  :formObj="candidateStage" :content="candidateContent"  ref="candidateStage" @changeDate="markLabel"></table-detail-big>
+                                <table-detail-big  :formObj="candidateStage" :content="candidateContent"  ref="candidateStage"></table-detail-big>
                             </el-main>
                         </el-container>
 
@@ -60,7 +60,7 @@
                         <el-container class="inforContainer">
                             <el-header width="80px" class="inforHead"><el-tag type="success" class="tag">预备党员的教育考察和转正阶段</el-tag></el-header>
                             <el-main class="inforMain">
-                                <table-detail-big  :formObj="positiveStage" :content="positiveContent"  ref="positiveStage" @changeDate="markLabel"></table-detail-big>
+                                <table-detail-big  :formObj="positiveStage" :content="positiveContent"  ref="positiveStage"></table-detail-big>
                             </el-main>
                         </el-container>
 
@@ -80,7 +80,7 @@ import  tableDetailBig from "../components/tableDetailBig.vue"
 import {getTableForm} from "../api/formDate.js"
 // dateTranfer
 
-import {fetchDataByStuId,cInfor} from "../api/index";
+import {getDataOfStuIdFromBN,cInfor} from "../api/index";
 // getDataOfStuIdFromBN
 export default {
     name: "baseform",
@@ -89,7 +89,7 @@ export default {
     },
     created(){
         // console.log('BaseFormSelf stuId:',this.$store.state.role.stuId);
-        this.person = fetchDataByStuId('1571232');
+        // this.person = fetchDataByStuId('1571232');
 
 
         this.tableForm = getTableForm();
@@ -103,17 +103,18 @@ export default {
         this.setFormData();
 
         // 从后端得到个人信息
-        // getDataOfStuIdFromBN(localStorage.getItem('stuId')+"").then((_data)=>{
-        //     this.person = _data;
-        //     this.tableForm = getTableForm();
-        //     this.tableDetail = this.tableForm.tableDetail;//基本信息
-        //     this.applyStage = this.tableForm.applyStage;//申请入党阶段
-        //     this.actvStage = this.tableForm.actvStage;//入党积极分子的确定和培养阶段
-        //     this.devStage = this.tableForm.devStage;//发展对象的确定和考察阶段
-        //     this.candidateStage = this.tableForm.candidateStage;// 预备党员的接收阶段
-        //     this.positiveStage = this.tableForm.positiveStage;// 预备党员的教育考察和转正阶段
-        //     this.setFormData();
-        // })
+        getDataOfStuIdFromBN().then((_data)=>{
+            this.person = _data;
+            this.tableForm = getTableForm();
+            this.tableDetail = this.tableForm.tableDetail;//基本信息
+            this.applyStage = this.tableForm.applyStage;//申请入党阶段
+            this.actvStage = this.tableForm.actvStage;//入党积极分子的确定和培养阶段
+            this.devStage = this.tableForm.devStage;//发展对象的确定和考察阶段
+            this.candidateStage = this.tableForm.candidateStage;// 预备党员的接收阶段
+            this.positiveStage = this.tableForm.positiveStage;// 预备党员的教育考察和转正阶段
+            this.setFormData();
+            this.$nextTick(()=>this.markLabel());
+        })
 
         
     },
@@ -126,7 +127,76 @@ export default {
             redLabel:{},
 
             disabled:true,
-            person: {},
+            person: {
+                stuId:"",//学号
+                name:'',//姓名
+                gender:'',//性别
+                phone:'',//联系方式
+                national:'',//民族
+                home:'',//籍贯,使用了element-china-area-data
+                idCard:'',//身份证
+                birthday:'',//出生日期
+                grade:'',//年级
+                tclass:'',//班级
+                stuState:'',//学籍状态
+                major:'',//专业
+                proED:'',//学历
+                tutor:'',//导师
+                stage:'',//所处阶段
+                jnPartyTime:'',//党员增加时间
+                addParty:'',//党员增加
+                honour:'',//个人荣誉
+                bedroom:'',//寝室
+                duty:'',//职务
+                partyDuty:'',//党内职务
+                // branch:'1',//所在支部
+                branch:'',//所在支部
+                pTeacher:'',//培养联系人
+                leader:'',//入党介绍人
+                applyFileNumber:'',//入党志愿书编号
+            
+            
+                // 申请入党阶段
+                applyTime:'',//申请入党时间
+                talkTime:'',//谈心谈话时间
+            
+                //入党积极分子的确定和培养阶段
+                electLeagueTime:'',//团推优时间
+                actvTime:'',//确定积极分子时间
+                actvTrainTime:'',//积极分子培训时间
+                actvTrainResult:'',//积极分子培训班结业情况
+            
+                //发展对象的确定和考察阶段
+                devTime:'',//确定发展对象时间
+                devTrainTime:'',//发展对象培训时间
+                devTrainResult:'',//发展对象培训班结业情况
+                classRank:'',//业务课排名
+                extFileTime:'',//外调材料日期
+                polFileTime:'',//政审材料日期
+                candidateTime:'',//拟发展时间
+                hPartyPreCheckTime:'',//发展党员上级党委预审日期
+                pubTime:'',//公示日期
+            
+                // 预备党员的接收阶段
+                jnTime:'',//入党时间
+                aPartyCheckTime:'',//入党总支审查日期
+                hPartyTalkTime:'',//发展党员上级组织谈话日期
+                hPartyPassTime:'',//入党上级党委审批日期
+                
+                
+                // 预备党员的教育考察和转正阶段
+                confirmTime:'',//转正时间
+                letterTime:'',//转正申请书时间
+                partyConfirmTime:'',//转正总支审查日期
+                hPartyConfirmTime:'',//转正上级党委审批日期
+                delayReadyTime:'',//延长预备期日期
+                delayCheckTime:'',//延长预备期总支审查日期
+                delayConfirmTime:'',//延长预备期党委审批日期
+            
+            
+                note:'',//备注
+            
+            },
 
             tableForm:'',
             tableDetail:'',//基本信息
@@ -145,60 +215,64 @@ export default {
         };
     },
     watch:{
-        redLabel(newValue){
-            let item="";
-            // console.log('redLabel',newValue);
-            for(let i=0;i<this.tableDetail.length;i++){
-                item = this.tableDetail[i];
-                if(newValue[item.prop]){
-                    this.tableDetail[i].redLabel = true;
-                }else{
-                    this.tableDetail[i].redLabel = false;
+        redLabel:{
+            handler:function(newValue){
+                let item="";
+                // console.log('redLabel',newValue);
+                for(let i=0;i<this.tableDetail.length;i++){
+                    item = this.tableDetail[i];
+                    if(newValue[item.prop]){
+                        this.tableDetail[i].redLabel = true;
+                    }else{
+                        this.tableDetail[i].redLabel = false;
+                    }
                 }
-            }
 
-            for(let i=0;i<this.applyStage.length;i++){
-                item = this.applyStage[i];
-                if(newValue[item.prop]){
-                    this.applyStage[i].redLabel = true;
-                }else{
-                    this.applyStage[i].redLabel = false;
+                for(let i=0;i<this.applyStage.length;i++){
+                    item = this.applyStage[i];
+                    if(newValue[item.prop]){
+                        this.applyStage[i].redLabel = true;
+                    }else{
+                        this.applyStage[i].redLabel = false;
+                    }
                 }
-            }
 
-            for(let i=0;i<this.actvStage.length;i++){
-                item = this.actvStage[i];
-                if(newValue[item.prop]){
-                    this.actvStage[i].redLabel = true;
-                }else{
-                    this.actvStage[i].redLabel = false;
+                for(let i=0;i<this.actvStage.length;i++){
+                    item = this.actvStage[i];
+                    if(newValue[item.prop]){
+                        this.actvStage[i].redLabel = true;
+                    }else{
+                        this.actvStage[i].redLabel = false;
+                    }
                 }
-            }
 
-            for(let i=0;i<this.devStage.length;i++){
-                item = this.devStage[i];
-                if(newValue[item.prop]){
-                    this.devStage[i].redLabel = true;
-                }else{
-                    this.devStage[i].redLabel = false;
+                for(let i=0;i<this.devStage.length;i++){
+                    item = this.devStage[i];
+                    if(newValue[item.prop]){
+                        this.devStage[i].redLabel = true;
+                    }else{
+                        this.devStage[i].redLabel = false;
+                    }
                 }
-            }
-            for(let i=0;i<this.candidateStage.length;i++){
-                item = this.candidateStage[i];
-                if(newValue[item.prop]){
-                    this.candidateStage[i].redLabel = true;
-                }else{
-                    this.candidateStage[i].redLabel = false;
+                for(let i=0;i<this.candidateStage.length;i++){
+                    item = this.candidateStage[i];
+                    if(newValue[item.prop]){
+                        this.candidateStage[i].redLabel = true;
+                    }else{
+                        this.candidateStage[i].redLabel = false;
+                    }
                 }
-            }
-            for(let i=0;i<this.positiveStage.length;i++){
-                item = this.positiveStage[i];
-                if(newValue[item.prop]){
-                    this.positiveStage[i].redLabel = true;
-                }else{
-                    this.positiveStage[i].redLabel = false;
+                for(let i=0;i<this.positiveStage.length;i++){
+                    item = this.positiveStage[i];
+                    if(newValue[item.prop]){
+                        this.positiveStage[i].redLabel = true;
+                    }else{
+                        this.positiveStage[i].redLabel = false;
+                    }
                 }
-            }
+        
+            },
+            deep:true
         }
     },
 
@@ -259,8 +333,9 @@ export default {
 
         markLabel(){
             let nData = this.getDateFromTableForm();
+            console.log(nData);
             this.checkTime(nData);
-            // console.log('labelRed:',this.redLabel);
+            console.log('labelRed:',this.redLabel);
         },
         getDateFromTableForm(){
             return Object.assign({}, 
@@ -483,6 +558,7 @@ export default {
             }
 
             nData = this.getDateFromTableForm();
+            console.log("the data:",nData);
             str += this.checkTime(nData);
 
 

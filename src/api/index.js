@@ -1,6 +1,6 @@
 import request from '../utils/request';
 import { downLoadExcel,importfxx} from "../utils/excel/upDownExcel.js";
-import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDate,formDate} from './formDate.js';
+import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDateToBranch,formDate} from './formDate.js';
 
 
 /**
@@ -13,8 +13,6 @@ import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDate,formDate} 
 const requestData = (urlL,query, rqType = 'post') => {
     console.log(urlL,rqType,query);
     // let list = 
-
-   
 
     return request({
         url: urlL,
@@ -30,7 +28,7 @@ const requestData = (urlL,query, rqType = 'post') => {
 //返回处理数据的函数数组，数据以闭包的型式保存。
 let dataFun = (function(){
     
-    // 将前端数据转变成后端需要的格式
+    // 将前端数据转变成后端需要的格式（将所有数据都变成字符串型式）
     function transToBackEnd(dataArr){
         let list = JSON.parse(JSON.stringify(dataArr));
         let item;
@@ -39,15 +37,11 @@ let dataFun = (function(){
             item = list[i];
             for(let k in item){
                 if(Object.prototype.hasOwnProperty.call(item,k)){
-                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
-                        if(item[k] instanceof Array){
-                            item[k] = item[k].join(',');
-                        }else{
-                            item[k] = '';
-                        }
-
-                    } else if(k==='home'&&(item[k] instanceof Array)){
+                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'||k==='home')&&(item[k] instanceof Array)){
                         item[k] = item[k].join(',');
+
+                    }else if(item[k]==''){
+                        item[k] = "_$"//为了后端好处理空值存成这种字符串
                     }
                 }
             }
@@ -59,16 +53,16 @@ let dataFun = (function(){
     //将后端数据转换成前端的格式
     function tranDataToFrontEnd(list){
         //把list中的actvTrainTime，devTrainTime，pubTime，home转成数组
-        let it;
+        let it, regT = /^[0-9]+,[0-9]+$/, regH = /^[0-9]+,[0-9]+,[0-9]+$/;//正则表达式一定要写上^和$表示以什么开头，以什么结尾
         for(let i=0;i<list.length;i++){
             it = list[i];
             for(let k in it){
                 if(Object.prototype.hasOwnProperty.call(it,k)){
-                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
-                        if(it[k].length>0 && typeof it[k] =="string" ){
-                            it[k] = it[k].split(',');
-                        }
-                    }else if(k==="home" && typeof it[k] =="string"){
+                    if(it[k] == "_$"){
+                        it[k] = '';//_$为了后端好处理空值存成这种字符串,这里需要转换成前端的格式
+                    }else if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime')&&(typeof it[k] =="string" && it[k].length>0 &&  regT.test(it[k]))){
+                        it[k] = it[k].split(',');
+                    }else if(k==="home" &&(typeof it[k] =="string" && it[k].length>0 && regH.test(it[k]) )){
                         it[k] = it[k].split(',');
                     }else if(formDate[k]){// 如果是下拉选框，则转成1,2,3的格式
                         Object.keys(formDate[k]).forEach(eItem=>{
@@ -83,7 +77,6 @@ let dataFun = (function(){
 
         // 将下拉框选项的数据转成要显示的样式即转成1,2,3
 
-
         return list;
     }
 
@@ -97,7 +90,8 @@ let dataFun = (function(){
             
             localStorage.setItem("token", item.data.token);
             localStorage.setItem("stuId", item.data.user.stu_id);
-            console.log('token:',localStorage.token,localStorage.stuId);
+            localStorage.setItem("duty",item.data.duty);
+            // console.log('token:',localStorage.token,localStorage.stuId);
 
             return item.data.duty;
         },()=>{throw new Error("登录失败,请输入正确的账号密码重新登录")});
@@ -108,32 +102,33 @@ let dataFun = (function(){
             console.log('get data from backend item:',item);
             data.branchs = item.data.branches;
             console.log('branch:',item.data.brList);
-            insertFormDate('branch',item.data.brList);
+            insertFormDateToBranch('branch',item.data.brList);
 
 
             // 将数据格式转变成前端需要的格式
-            let list = JSON.parse(JSON.stringify(item.data.infos.slice(0)));
+            let list = JSON.parse(JSON.stringify(item.data.infos));
            
             list = tranDataToFrontEnd(list);
             //将获取的数据存储在data.list
             data.list = list;
-            console.log('get Data from:',data.list);
+            // console.log('get Data from:',data.list);
             return item.data.duty;
         });
     }
 
     //从后台得到studId单个人的信息
-    function getDataOfStuIdFromBN(stuId){
-        return requestData('/personInfor',{stuId:stuId},'post').then((item)=>{
+    function getDataOfStuIdFromBN(){
+        
+        return requestData('/personInfor',{},'post').then((item)=>{
             console.log('get data from backend item:',item);
-            insertFormDate('branch',item.data.brList);
+            insertFormDateToBranch('branch',item.data.brList);
 
             // 将数据格式转变成前端需要的格式
-            let list = JSON.parse(JSON.stringify(item.data.infos.slice(0)));
+            let list = JSON.parse(JSON.stringify([item.data.infos]));
             list = tranDataToFrontEnd(list);
 
             console.log('get Data from:',list);
-            return list;
+            return list[0];
         });
     }
     function changePsw(obj){
@@ -171,23 +166,17 @@ let dataFun = (function(){
         return arr;
     }
 
-    //数组属性, 排在后面的元素的属性如果不为空，则会替代排在前面的拥有相同stuId的元素的属性。
-    // 如果排在前面的元素的属性为空，则不会改变排在后面的拥有相同stuId的元素的属性。
-    // 更新完成后，，排在后面的这个元素被丢弃。
+    //数组属性, 排在后面的元素的属性会替代排在前面的拥有相同stuId的元素的属性。
+    // 更新完成后，排在后面的这个元素被丢弃。
     function arrAttrUni(arr){
         if(!arr||arr.length===0) return [];
-
-        let valKeys = Object.keys(arr[0])
-
         for(let i=arr.length-1;i>0;i--){
             let val = arr[i];
+            let valKeys = Object.keys(val);
             for(let j=i-1;j>=0;j--){
                 if(val.stuId+''===arr[j].stuId+''){
                     valKeys.forEach(item=>{
-                        // 如果val的属性值不为空，就用这个值更新arr[j]的相同属性
-                        if(val[item]){
-                            arr[j][item] = val[item];
-                        }
+                        arr[j][item] = val[item];
                     });
                     arr.splice(i,1);
                     break;
@@ -196,6 +185,8 @@ let dataFun = (function(){
         }
         return arr;
     }
+
+
 
     
 
@@ -213,30 +204,49 @@ let dataFun = (function(){
 
             requestData('/updateAll',list,'post').then((item)=>{
                 console.log("updateAll item:",item);
-                insertFormDate('branch',item.data.brList);
-                data.list = tranDataToFrontEnd(item.data.infos);
+                insertFormDateToBranch('branch',item.data.brList);
                 data.branchs = item.data.branches;
 
-                //删除返回的代表不被允许（周岁小于18岁）添加进数据库的failedList数组中的stuId，
-                // let failArr = {};
-                // item.failedList.forEach(v=>{
-                //     failArr[v] = true;
-                // });
+                let dataAdd = tranDataToFrontEnd(dataArr.length>0?dataArr:[]);
+                let dataFail = item.failedList.length>0?item.failedList:[];
+                let dataSort = item.data.infos.length>0?item.data.infos:[];
+                data.list = uniSortData(JSON.parse(JSON.stringify(data.list)),dataAdd,dataFail,dataSort);
 
-                // for(let i= dataArr.length - 1;i>=0;i--){
-                //     if(failArr[dataArr[i].stuId]){
-                //         dataArr.splice(i,1);
-                //     }
-                // }
-
-                // data.list = data.list.concat(dataArr);
-                // data.list = arrAttrUni(data.list);
-                // console.log('data_list:',data.list);
-                resolve('202');
+                resolve({state:202, failList:dataFail});
             },item=>{
                 reject(item);
             });      
         })
+    }
+
+    // 删除导入失败的学生的数据，并按照给定的stuId数据进行排序
+    function uniSortData(dataList, dataAdd, dataFail, dataSort){
+        let  _dataId = {}, a = 0, nArr, reData = [], dataId;
+        
+        dataAdd.forEach(item=>{
+            _dataId[item.stuId] = a++;
+        });
+        dataFail.forEach(item=>{
+            if(_dataId[item]>=0){
+                dataAdd.splice(_dataId[item],1);
+            }
+        })
+        // 合并数据后，根据dataSort中的顺序对合并后的数据进行重排
+        nArr = arrAttrUni(dataList.concat(dataAdd));
+        // console.log("nArr")
+        a = 0;
+        _dataId = {};
+        nArr.forEach(item=>{
+            _dataId[item.stuId] = a++;
+        });
+        dataSort.forEach(item=>{
+            dataId = _dataId[item]
+            if(dataId>=0){
+                reData.push(nArr[dataId]);
+            }
+        })
+        
+        return reData;
     }
      
 
@@ -260,6 +270,9 @@ let dataFun = (function(){
                         // len--;
                     } 
                 }
+                insertFormDateToBranch('branch',item.data.brList);
+                data.branchs = item.data.branches;
+
                 resolve('成功删除')
             },item=>{
                 reject(item);
@@ -329,6 +342,10 @@ let dataFun = (function(){
                         // console.log('key:',key,'  the value:',query[key], '  the item valu:',item[key]);
                         // 对于stuId，只要item[key]是以query[key]开头的就行
                         if((key==='stuId')&&(String(item[key]).indexOf(query[key])===0)){
+                            continue;
+                        }
+                        // 对于name，只要item[key]是以query[key]开头的就行
+                        if((key==='name')&&(String(item[key]).indexOf(query[key])===0)){
                             continue;
                         }
                         // 对于grade，只要item[key]是以query[key]开头的就行
@@ -653,7 +670,7 @@ let dataFun = (function(){
             try{
                 _data = await importfxx(fileList[i].raw, filesObj.listTitle,filesObj.tableTitle);
                 
-                console.log("beforeStyle:",_data)
+                // console.log("beforeStyle:",_data)
                 _data = loadDateStyle(_data);
                 // console.log("afterStyle:",_data);
                 tableArray = tableArray.concat(_data);
@@ -683,7 +700,7 @@ let dataFun = (function(){
                 if(Object.prototype.hasOwnProperty.call(item,k)){
                 //》》》》这里其实涉及到一个问题，我们通过importfxx从表格获取的数据不一定都是字符串类型的数据，
                     item[k] = item[k]+'';
-                    if(k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'){
+                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime')&&(typeof item[k]=='string' && item[k].length>0)){
                         
                         arr = item[k].split(',');
                         item[k] = arr;
@@ -848,6 +865,76 @@ let dataFun = (function(){
             
             
                 note:'信息好多，代码好长',//备注
+            
+            },
+            {
+                stuId:"15129652",//学号
+                name:'dsf',//姓名
+                gender:'',//性别
+                phone:'',//联系方式
+                national:'',//民族
+                home:'',//籍贯,使用了element-china-area-data
+                idCard:'',//身份证
+                birthday:'20010306',//出生日期
+                grade:'',//年级
+                tclass:'',//班级
+                stuState:'',//学籍状态
+                major:'',//专业
+                proED:'',//学历
+                tutor:'',//导师
+                stage:'',//所处阶段
+                jnPartyTime:'',//党员增加时间
+                addParty:'',//党员增加
+                honour:'',//个人荣誉
+                bedroom:'',//寝室
+                duty:'',//职务
+                partyDuty:'',//党内职务
+                // branch:'1',//所在支部
+                branch:'',//所在支部
+                pTeacher:'',//培养联系人
+                leader:'',//入党介绍人
+                applyFileNumber:'',//入党志愿书编号
+            
+            
+                // 申请入党阶段
+                applyTime:'',//申请入党时间
+                talkTime:'',//谈心谈话时间
+            
+                //入党积极分子的确定和培养阶段
+                electLeagueTime:'',//团推优时间
+                actvTime:'',//确定积极分子时间
+                actvTrainTime:'',//积极分子培训时间
+                actvTrainResult:'',//积极分子培训班结业情况
+            
+                //发展对象的确定和考察阶段
+                devTime:'',//确定发展对象时间
+                devTrainTime:'',//发展对象培训时间
+                devTrainResult:'',//发展对象培训班结业情况
+                classRank:'',//业务课排名
+                extFileTime:'',//外调材料日期
+                polFileTime:'',//政审材料日期
+                candidateTime:'',//拟发展时间
+                hPartyPreCheckTime:'',//发展党员上级党委预审日期
+                pubTime:'',//公示日期
+            
+                // 预备党员的接收阶段
+                jnTime:'',//入党时间
+                aPartyCheckTime:'',//入党总支审查日期
+                hPartyTalkTime:'',//发展党员上级组织谈话日期
+                hPartyPassTime:'',//入党上级党委审批日期
+                
+                
+                // 预备党员的教育考察和转正阶段
+                confirmTime:'',//转正时间
+                letterTime:'',//转正申请书时间
+                partyConfirmTime:'',//转正总支审查日期
+                hPartyConfirmTime:'',//转正上级党委审批日期
+                delayReadyTime:'',//延长预备期日期
+                delayCheckTime:'',//延长预备期总支审查日期
+                delayConfirmTime:'',//延长预备期党委审批日期
+            
+            
+                note:'',//备注
             
             },
 
@@ -1237,18 +1324,21 @@ var downLoadTemp = {
     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
     idCard:'13141414',//身份证
     birthday:'19950102',//出生日期
-    grade:'20级',//年级
-    tclass:'2001班',//班级
+    grade:'18级',//年级
+    tclass:'1903班',//班级
     proED:'1',//学历
-    tutor:'于师傅',//导师
+    stuState:'1',//学籍状态
+    major:'计算机工程',//专业
+    tutor:'张李',//导师
     stage:'1',//所处阶段
-    jnPartyTime:'20190916',//党员增加时间
-    addParty:'2',//党员增加
+    jnPartyTime:'',//党员增加时间
+    addParty:'1',//党员增加
     honour:'东北大学一等奖学金',//个人荣誉
     bedroom:'3舍A231',//寝室
     duty:'班长',//职务
-    partyDuty:'支部书记',//党内职务
-    branch:'1',//所在支部
+    partyDuty:'宣传委员',//党内职务
+    // branch:'1',//所在支部
+    branch:'第一党支部',//所在支部
     
     pTeacher:'李福',//培养联系人
     leader:'上官云',//入党介绍人
@@ -1256,36 +1346,36 @@ var downLoadTemp = {
 
 
     // 申请入党阶段
-    applyTime:'20190920',//申请入党时间
+    applyTime:'20180112',//申请入党时间
     talkTime:'20191005',//谈心谈话时间
 
     //入党积极分子的确定和培养阶段
     electLeagueTime:'20191025',//团推优时间
-    actvTime:'20190511',//确定积极分子时间
-    actvTrainTime:['20200708','20200801'],//积极分子培训时间
-    actvTrainResult:'1',//积极分子培训班结业情况
+    actvTime:'20180511',//确定积极分子时间
+    actvTrainTime:['20180708','20180801'],//积极分子培训时间
+    actvTrainResult:'2',//积极分子培训班结业情况
 
     //发展对象的确定和考察阶段
-    devTime:'20201201',//确定发展对象时间
-    devTrainTime:['20210201','20210302'],//发展对象培训时间
-    devTrainResult:'1',//发展对象培训班结业情况
+    devTime:'20181201',//确定发展对象时间
+    devTrainTime:['20180201','20180302'],//发展对象培训时间
+    devTrainResult:'2',//发展对象培训班结业情况
     classRank:'6',//业务课排名
     extFileTime:'20210412',//外调材料日期
     polFileTime:'20210412',//政审材料日期
     candidateTime:'202104',//拟发展时间
     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-    pubTime:['20210201','20210502'],//公示日期
+    pubTime:['20180201','20180302'],//公示日期
 
     // 预备党员的接收阶段
-    jnTime:'20210502',//入党时间
+    jnTime:'20180502',//入党时间
     aPartyCheckTime:'20210503',//入党总支审查日期
     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
     hPartyPassTime:'20210505',//入党上级党委审批日期
     
     
     // 预备党员的教育考察和转正阶段
-    confirmTime:'20210506',//转正时间
-    letterTime:'20200910',//转正申请书时间
+    confirmTime:'20180506',//转正时间
+    letterTime:'20210910',//转正申请书时间
     partyConfirmTime:'20210506',//转正总支审查日期
     hPartyConfirmTime:'20210507',//转正上级党委审批日期
     delayReadyTime:'20210508',//延长预备期日期

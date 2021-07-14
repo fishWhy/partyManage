@@ -21,6 +21,7 @@ function downLoadExcel(tableData,listTitle,tableTitle,fileName){
  * @param  listTitle 为要显示在页面中的表头，这里要将tableTitle转换成listTitle的样式 
  */
 function importfxx(obj,listTitle,tableTitle) {
+    // console.log('title:',listTitle,tableTitle)
     var fileTemp = obj;
 
     if(fileTemp){
@@ -36,49 +37,46 @@ function importfxx(obj,listTitle,tableTitle) {
                             type: 'binary'
                     });
                     
-                    var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
-                    console.log('the data:',data);
+                    var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'###$###'});//outdata就是你想要的东西
+                    // console.log('the data:',data);
+                    
                     var _data = [];
                     //检查导入的表格中的数据是否符合格式的要求，只检测表头是否符合要求
                     for(let i=0;i<data.length;i++){
                         let _objKeys = Object.keys(data[i]);
-                        // console.log('_objKeys:',_objKeys);
-                        // console.log('_tableTitle::',tableTitle);
 
                         if(_objKeys.length<=tableTitle.length){
                             let item;
                             for(let i=0;i<_objKeys.length;i++){
                                 item = _objKeys[i];
+
                                 if(tableTitle.indexOf(item)===-1){
                                     reject(`1.文件《${data[i].name}》内容格式错误，${item},请删除后重新上传！`);
                                     return;
                                 }
                             }
-
-                            // tableTitle.forEach(item=>{
-                            //     if(_objKeys.indexOf(item)===-1){
-                            //         // console.log('the item is',item);
-                            //        reject(`1.文件《${data[i].name}》内容格式错误，${item},请删除后重新上传！`);
-                            //         return;
-                            //     }
-                            // })
                         }else{
                             reject(`2.文件《${obj.name}》内容格式错误，请删除后重新上传！,${_objKeys.length},${tableTitle.length}`);
                             return;
-
                         }
                     }
+                    
                     for(let i=0;i<data.length;i++){
                         let _obj = data[i];
                         let _nobj = {};
                         Object.keys(_obj).forEach(item=>{
                             let _val = _obj[item];
+                            if(_obj[item]=="###$###"){
+                                _val = '';
+                                // console.log('new Data')
+                            }
                             _nobj[listTitle[tableTitle.indexOf(item)]] = _val;
                             
                         })
                         _data.push(_nobj);
                     
                     }
+                    // console.log('the data:',_data);
                     resolve(_data);
                 }
                 reader.readAsBinaryString(fileTemp);

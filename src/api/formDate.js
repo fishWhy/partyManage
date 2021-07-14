@@ -10,11 +10,11 @@ let formDate = {
     isApplay:{0:'全部',1:'是',2:'否'},
     actvTrainResult:{0:'全部',1:'通过',2:'不通过'},
     devTrainResult:{0:'全部',1:'通过',2:'不通过'},
-    partyDuty:{0:'全部',1:'普通党员',2:'宣传委员',3:'组织委员',4:'党支部书记',5:'管理员',"-1":'无'},
+    partyDuty:{0:'全部',1:'普通党员',2:'宣传委员',3:'组织委员',4:'党支部书记',5:'管理员',"-1":'其他'},
     stuState:{0:'全部',1:'在读',2:'已毕业'}
 }
 
-function insertFormDate(attri,obj){
+function insertFormDateToBranch(attri,obj){
     // console.log('insertFormDate:',obj,typeof obj);
     if( typeof obj == 'string'){
         let temptArr = obj.split(','),inObj = {};
@@ -132,7 +132,7 @@ function addressToPtd(list){
     let rs = [];
 
     for(let i=0;i<list.length;i++){ 
-        if(Object.prototype.hasOwnProperty.call(list[i],'home')){
+        if((Object.prototype.hasOwnProperty.call(list[i],'home'))&&(typeof list[i]['home'] == 'string' && list[i]['home'].length>0)){
             //codeArr是一个长度为3的数组分别是省市区的区域码，["130000","130300","130303"]，这里会转成 河北省/秦皇岛市/山海关区
             let addr = list[i]['home'].split('/');
             rs = [];
@@ -150,6 +150,7 @@ function addressToPtd(list){
 //这里options设为空数组，是为了方便更改数据，下面会调用函数填上它们应有的值
 let baseForm = [
     {label:'学号',prop:'stuId',type:'Input'},
+    {label:'姓名',prop:'name',type:'Input'},
     {label:'性别',prop:'gender',type:'Select',options:[]},
     {label:'民族',prop:'national',type:'Select',options:[]},
     {label:'学历',prop:'proED',type:'Select',options:[]},
@@ -207,15 +208,12 @@ let tableDetail = [
 
 
     {label:'导师',prop:'tutor',type:'Input'},
-    {label:'所处阶段',prop:'stage',type:'Select',options:[]},
     {label:'党员增加时间',prop:'jnPartyTime',type:'YMR'},
-    {label:'党内职务',prop:'partyDuty',type:'Select',options:[]},
 
 
 
 
     {label:'职务',prop:'duty',type:'Input'},
-    {label:'所在支部',prop:'branch',type:'Select',options:[],styleObj:{'width':'260px'}},
     {label:'党员增加',prop:'addParty',type:'Select',options:[],styleObj:{'width':'340px'}},
 
 
@@ -227,8 +225,15 @@ let tableDetail = [
 ];
 //申请入党阶段
 let applyStage = [
+
     {label:'申请入党时间',prop:'applyTime',type:'YMR'},
-    {label:'谈心谈话党时间',prop:'talkTime',type:'YMR'}
+    {label:'谈心谈话党时间',prop:'talkTime',type:'YMR'},
+
+    {type:'br'},
+    {label:'所处阶段',prop:'stage',type:'Select',options:[]},
+    {label:'党内职务',prop:'partyDuty',type:'Select',options:[]},
+    {label:'所在支部',prop:'branch',type:'Select',options:[],styleObj:{'width':'300px'}},
+
 ];
 //入党积极分子的确定和培养阶段
 let actvStage = [
@@ -335,7 +340,7 @@ function getTableForm(){
 }
 
 
-export {getFormList,getTableForm,dateTranfer,inFormToNone,listMap,ptdToAddress,addressToPtd,dateBack,insertFormDate,formDate}
+export {getFormList,getTableForm,dateTranfer,inFormToNone,listMap,ptdToAddress,addressToPtd,dateBack,insertFormDateToBranch,formDate}
 
 
 var listMap = {
