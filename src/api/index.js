@@ -87,13 +87,9 @@ let dataFun = (function(){
         param.password = obj.password;
         return requestData('/login',param,'post').then((item)=>{
             console.log('login item:',item);
-            
-            localStorage.setItem("token", item.data.token);
-            localStorage.setItem("stuId", item.data.user.stu_id);
-            localStorage.setItem("duty",item.data.duty);
             // console.log('token:',localStorage.token,localStorage.stuId);
 
-            return item.data.duty;
+            return item.data;// 将用户名，token，role值返回
         },()=>{throw new Error("登录失败,请输入正确的账号密码重新登录")});
     }
    
@@ -113,7 +109,7 @@ let dataFun = (function(){
             data.list = list;
             // console.log('get Data from:',data.list);
             return item.data.duty;
-        });
+        },()=>Promise.reject('404'));
     }
 
     //从后台得到studId单个人的信息
@@ -129,7 +125,7 @@ let dataFun = (function(){
 
             console.log('get Data from:',list);
             return list[0];
-        });
+        },()=>Promise.reject('404'));
     }
     function changePsw(obj){
         let psObj = {};
@@ -311,6 +307,9 @@ let dataFun = (function(){
                         return;
                     }
                 }
+                // 普通党员登录，修改个人信息时显示
+                resolve(infor.stuId)
+                return;
                  
             },item=>{
                 reject(item)
@@ -327,7 +326,7 @@ let dataFun = (function(){
            
             
             let query = JSON.parse(JSON.stringify(q));
-            // console.log('query:',query)
+            console.log('query:',query)
 
             let _data= [], isSelected;
             // console.log('dataList:',data.list)
@@ -338,7 +337,7 @@ let dataFun = (function(){
                     // if(query[key]&&key!=='pageIndex'){
                     //     console.log('the query key:',key)
                     // }
-                    if(query[key]&&key!=='pageIndex'){
+                    if(query[key]&&key!=='pageIndex'&&key!=='pageSize'){
                         // console.log('key:',key,'  the value:',query[key], '  the item valu:',item[key]);
                         // 对于stuId，只要item[key]是以query[key]开头的就行
                         if((key==='stuId')&&(String(item[key]).indexOf(query[key])===0)){
@@ -419,8 +418,9 @@ let dataFun = (function(){
             // console.log('_data',_data)
 
 
-            let len = _data.length, pageSize = data.perPageNum, pageIndex = query.pageIndex, pageTotal;
-            // console.log('len:',len,'pageSize:',pageSize,'pageNum:',Math.floor(len/pageSize))
+            let len = _data.length, pageSize = query.pageSize, pageIndex = query.pageIndex, pageTotal;
+            
+            console.log('len:',len,'pageSize:',pageSize,'pageNum:',Math.floor(len/pageSize))
             pageTotal = Math.max(Math.ceil(len/pageSize),1);
             if(query.pageIndex>pageTotal){
                 pageIndex = pageTotal;
@@ -429,11 +429,11 @@ let dataFun = (function(){
             
 
             
-            let _rDate={list:[],itemTotal:'',pageSize:'',pageIndex:''};
+            let _rDate={list:[],itemTotal:''};
             let list = _data.slice(start,end), finalList = [];
 
-            // console.log("list:",list)
-            // console.log("start:",start,"end:",end);
+            console.log("list:",list)
+            console.log("start:",start,"end:",end);
             if(attriShow&&attriShow.length>0){
                 // console.log("attriShow")
                 let attri = {};
@@ -457,8 +457,6 @@ let dataFun = (function(){
                 _rDate.list = list;
             }
             _rDate.itemTotal = len;
-            _rDate.pageSize = pageSize;
-            _rDate.pageIndex = pageIndex;
 
 
             resolve(_rDate);
@@ -722,294 +720,12 @@ let dataFun = (function(){
 
      // 关于每条数据中每个属性值0,1,2..代表什么可见：../api/formDate.js
      var data = {
-         perPageNum: 20,
+         perPageNum: 30,
 
         list:[
-            {
-                stuId:"1871232",//学号
-                name:'孙亮',//姓名
-                gender:'1',//性别
-                phone:'123415',//联系方式
-                national:'1',//民族
-                home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-                idCard:'13141414',//身份证
-                birthday:'19950102',//出生日期
-                grade:'18级',//年级
-                tclass:'1903班',//班级
-                proED:'1',//学历
-                stuState:'1',//学籍状态
-                major:'计算机工程',//专业
-                tutor:'张李',//导师
-                stage:'1',//所处阶段
-                jnPartyTime:'',//党员增加时间
-                addParty:'1',//党员增加
-                honour:'东北大学一等奖学金',//个人荣誉
-                bedroom:'3舍A231',//寝室
-                duty:'班长',//职务
-                partyDuty:'宣传委员',//党内职务
-                // branch:'1',//所在支部
-                branch:'第一党支部',//所在支部
-                
-                pTeacher:'李福',//培养联系人
-                leader:'上官云',//入党介绍人
-                applyFileNumber:'13415',//入党志愿书编号
-            
-            
-                // 申请入党阶段
-                applyTime:'20180112',//申请入党时间
-                talkTime:'20191005',//谈心谈话时间
-            
-                //入党积极分子的确定和培养阶段
-                electLeagueTime:'20191025',//团推优时间
-                actvTime:'20180511',//确定积极分子时间
-                actvTrainTime:['20180708','20180801'],//积极分子培训时间
-                actvTrainResult:'2',//积极分子培训班结业情况
-            
-                //发展对象的确定和考察阶段
-                devTime:'20181201',//确定发展对象时间
-                devTrainTime:['20180201','20180302'],//发展对象培训时间
-                devTrainResult:'2',//发展对象培训班结业情况
-                classRank:'6',//业务课排名
-                extFileTime:'20210412',//外调材料日期
-                polFileTime:'20210412',//政审材料日期
-                candidateTime:'202104',//拟发展时间
-                hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-                pubTime:['20180201','20180302'],//公示日期
-            
-                // 预备党员的接收阶段
-                jnTime:'20180502',//入党时间
-                aPartyCheckTime:'20210503',//入党总支审查日期
-                hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-                hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-                // 预备党员的教育考察和转正阶段
-                confirmTime:'20180506',//转正时间
-                letterTime:'20210910',//转正申请书时间
-                partyConfirmTime:'20210506',//转正总支审查日期
-                hPartyConfirmTime:'20210507',//转正上级党委审批日期
-                delayReadyTime:'20210508',//延长预备期日期
-                delayCheckTime:'20210508',//延长预备期总支审查日期
-                delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-                note:'信息好多，代码好长',//备注
-            
-            },
-
-            {
-                stuId:"1571232",//学号
-                name:'赵亮',//姓名
-                gender:'2',//性别
-                phone:'123415',//联系方式
-                national:'2',//民族
-                home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-                idCard:'13141414',//身份证
-                birthday:'19950112',//出生日期
-                grade:'19级',//年级
-                tclass:'1901班',//班级
-                stuState:'2',//学籍状态
-                major:'软件工程',//专业
-                proED:'1',//学历
-                tutor:'于师傅',//导师
-                stage:'1',//所处阶段
-                jnPartyTime:'20210516',//党员增加时间
-                addParty:'2',//党员增加
-                honour:'东北大学一等奖学金',//个人荣誉
-                bedroom:'3舍A231',//寝室
-                duty:'班长',//职务
-                partyDuty:'组织委员',//党内职务
-                // branch:'1',//所在支部
-                branch:'第二党支部',//所在支部
-                pTeacher:'李福',//培养联系人
-                leader:'上官云',//入党介绍人
-                applyFileNumber:'13415',//入党志愿书编号
-            
-            
-                // 申请入党阶段
-                applyTime:'20190920',//申请入党时间
-                talkTime:'20191005',//谈心谈话时间
-            
-                //入党积极分子的确定和培养阶段
-                electLeagueTime:'20191025',//团推优时间
-                actvTime:'2020051',//确定积极分子时间
-                actvTrainTime:['20200708','20200801'],//积极分子培训时间
-                actvTrainResult:'1',//积极分子培训班结业情况
-            
-                //发展对象的确定和考察阶段
-                devTime:'20201201',//确定发展对象时间
-                devTrainTime:['20210201','20210302'],//发展对象培训时间
-                devTrainResult:'1',//发展对象培训班结业情况
-                classRank:'6',//业务课排名
-                extFileTime:'20210412',//外调材料日期
-                polFileTime:'20210412',//政审材料日期
-                candidateTime:'202104',//拟发展时间
-                hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-                pubTime:['20210201','20210302'],//公示日期
-            
-                // 预备党员的接收阶段
-                jnTime:'20210502',//入党时间
-                aPartyCheckTime:'20210503',//入党总支审查日期
-                hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-                hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-                // 预备党员的教育考察和转正阶段
-                confirmTime:'20190506',//转正时间
-                letterTime:'20190910',//转正申请书时间
-                partyConfirmTime:'20210506',//转正总支审查日期
-                hPartyConfirmTime:'20210507',//转正上级党委审批日期
-                delayReadyTime:'20210508',//延长预备期日期
-                delayCheckTime:'20210508',//延长预备期总支审查日期
-                delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-                note:'信息好多，代码好长',//备注
-            
-            },
-            {
-                stuId:"15129652",//学号
-                name:'dsf',//姓名
-                gender:'',//性别
-                phone:'',//联系方式
-                national:'',//民族
-                home:'',//籍贯,使用了element-china-area-data
-                idCard:'',//身份证
-                birthday:'20010306',//出生日期
-                grade:'',//年级
-                tclass:'',//班级
-                stuState:'',//学籍状态
-                major:'',//专业
-                proED:'',//学历
-                tutor:'',//导师
-                stage:'',//所处阶段
-                jnPartyTime:'',//党员增加时间
-                addParty:'',//党员增加
-                honour:'',//个人荣誉
-                bedroom:'',//寝室
-                duty:'',//职务
-                partyDuty:'',//党内职务
-                // branch:'1',//所在支部
-                branch:'',//所在支部
-                pTeacher:'',//培养联系人
-                leader:'',//入党介绍人
-                applyFileNumber:'',//入党志愿书编号
-            
-            
-                // 申请入党阶段
-                applyTime:'',//申请入党时间
-                talkTime:'',//谈心谈话时间
-            
-                //入党积极分子的确定和培养阶段
-                electLeagueTime:'',//团推优时间
-                actvTime:'',//确定积极分子时间
-                actvTrainTime:'',//积极分子培训时间
-                actvTrainResult:'',//积极分子培训班结业情况
-            
-                //发展对象的确定和考察阶段
-                devTime:'',//确定发展对象时间
-                devTrainTime:'',//发展对象培训时间
-                devTrainResult:'',//发展对象培训班结业情况
-                classRank:'',//业务课排名
-                extFileTime:'',//外调材料日期
-                polFileTime:'',//政审材料日期
-                candidateTime:'',//拟发展时间
-                hPartyPreCheckTime:'',//发展党员上级党委预审日期
-                pubTime:'',//公示日期
-            
-                // 预备党员的接收阶段
-                jnTime:'',//入党时间
-                aPartyCheckTime:'',//入党总支审查日期
-                hPartyTalkTime:'',//发展党员上级组织谈话日期
-                hPartyPassTime:'',//入党上级党委审批日期
-                
-                
-                // 预备党员的教育考察和转正阶段
-                confirmTime:'',//转正时间
-                letterTime:'',//转正申请书时间
-                partyConfirmTime:'',//转正总支审查日期
-                hPartyConfirmTime:'',//转正上级党委审批日期
-                delayReadyTime:'',//延长预备期日期
-                delayCheckTime:'',//延长预备期总支审查日期
-                delayConfirmTime:'',//延长预备期党委审批日期
-            
-            
-                note:'',//备注
-            
-            },
-
             // {
-            //     stuId:"1971632",//学号
-            //     name:'钱赋',//姓名
-            //     gender:'1',//性别
-            //     phone:'123415',//联系方式
-            //     national:'1',//民族
-            //     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-            //     idCard:'13141414',//身份证
-            //     birthday:'19950102',//出生日期
-            //     grade:'20级',//年级
-            //     tclass:'2011班',//班级
-            //     proED:'1',//学历
-            //     tutor:'张李',//导师
-            //     stage:'1',//所处阶段
-            //     jnPartyTime:'20200616',//党员增加时间
-            //     addParty:'3',//党员增加
-            //     honour:'东北大学一等奖学金',//个人荣誉
-            //     bedroom:'3舍A231',//寝室
-            //     duty:'副班长',//职务
-            //     partyDuty:'宣传委员',//党内职务
-            //     branch:'1',//所在支部
-                
-            //     pTeacher:'李福',//培养联系人
-            //     leader:'上官云',//入党介绍人
-            //     applyFileNumber:'13415',//入党志愿书编号
-            
-            
-            //     // 申请入党阶段
-            //     applyTime:'20190920',//申请入党时间
-            //     talkTime:'20191005',//谈心谈话时间
-            
-            //     //入党积极分子的确定和培养阶段
-            //     electLeagueTime:'20191025',//团推优时间
-            //     actvTime:'2020051',//确定积极分子时间
-            //     actvTrainTime:['20190708','20190801'],//积极分子培训时间
-            //     actvTrainResult:'1',//积极分子培训班结业情况
-            
-            //     //发展对象的确定和考察阶段
-            //     devTime:'20201201',//确定发展对象时间
-            //     devTrainTime:['20210201','20210302'],//发展对象培训时间
-            //     devTrainResult:'1',//发展对象培训班结业情况
-            //     classRank:'6',//业务课排名
-            //     extFileTime:'20210412',//外调材料日期
-            //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'20210402',//拟发展时间
-            //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20180401','20180502'],//公示日期
-            
-            //     // 预备党员的接收阶段
-            //     jnTime:'20210502',//入党时间
-            //     aPartyCheckTime:'20210503',//入党总支审查日期
-            //     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-            //     hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-            //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20210506',//转正时间
-            //     letterTime:'20200910',//转正申请书时间
-            //     partyConfirmTime:'20210506',//转正总支审查日期
-            //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
-            //     delayReadyTime:'20210508',//延长预备期日期
-            //     delayCheckTime:'20210508',//延长预备期总支审查日期
-            //     delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-            //     note:'信息好多，代码好长',//备注
-            
-            // },
-
-            // {
-            //     stuId:"1671232",//学号
-            //     name:'孙科',//姓名
+            //     stuId:"1871232",//学号
+            //     name:'孙亮',//姓名
             //     gender:'1',//性别
             //     phone:'123415',//联系方式
             //     national:'1',//民族
@@ -1017,85 +733,20 @@ let dataFun = (function(){
             //     idCard:'13141414',//身份证
             //     birthday:'19950102',//出生日期
             //     grade:'18级',//年级
-            //     tclass:'1801班',//班级
+            //     tclass:'1903班',//班级
             //     proED:'1',//学历
+            //     stuState:'1',//学籍状态
+            //     major:'计算机工程',//专业
             //     tutor:'张李',//导师
             //     stage:'1',//所处阶段
-            //     jnPartyTime:'20190516',//党员增加时间
-            //     addParty:'2',//党员增加
-            //     honour:'东北大学二等奖学金',//个人荣誉
-            //     bedroom:'3舍A231',//寝室
-            //     duty:'班长',//职务
-            //     partyDuty:'支部书记',//党内职务
-            //     branch:'1',//所在支部
-                
-            //     pTeacher:'李福',//培养联系人
-            //     leader:'上官云',//入党介绍人
-            //     applyFileNumber:'13415',//入党志愿书编号
-            
-            
-            //     // 申请入党阶段
-            //     applyTime:'20190920',//申请入党时间
-            //     talkTime:'20191005',//谈心谈话时间
-            
-            //     //入党积极分子的确定和培养阶段
-            //     electLeagueTime:'20191025',//团推优时间
-            //     actvTime:'2020051',//确定积极分子时间
-            //     actvTrainTime:['20200708','20200801'],//积极分子培训时间
-            //     actvTrainResult:'1',//积极分子培训班结业情况
-            
-            //     //发展对象的确定和考察阶段
-            //     devTime:'20201201',//确定发展对象时间
-            //     devTrainTime:['20210201','20210302'],//发展对象培训时间
-            //     devTrainResult:'1',//发展对象培训班结业情况
-            //     classRank:'6',//业务课排名
-            //     extFileTime:'20210412',//外调材料日期
-            //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'20210402',//拟发展时间
-            //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20200201','20210302'],//公示日期
-            
-            //     // 预备党员的接收阶段
-            //     jnTime:'20210502',//入党时间
-            //     aPartyCheckTime:'20210503',//入党总支审查日期
-            //     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-            //     hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-            //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20210506',//转正时间
-            //     letterTime:'20201010',//转正申请书时间
-            //     partyConfirmTime:'20210506',//转正总支审查日期
-            //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
-            //     delayReadyTime:'20210508',//延长预备期日期
-            //     delayCheckTime:'20210508',//延长预备期总支审查日期
-            //     delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-            //     note:'信息好多，代码好长',//备注
-            
-            // },
-            // {
-            //     stuId:"1971172",//学号
-            //     name:'李亮',//姓名
-            //     gender:'2',//性别
-            //     phone:'123415',//联系方式
-            //     national:'1',//民族
-            //     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-            //     idCard:'13141414',//身份证
-            //     birthday:'19950102',//出生日期
-            //     grade:'20级',//年级
-            //     tclass:'2001班',//班级
-            //     proED:'1',//学历
-            //     tutor:'张李',//导师
-            //     stage:'1',//所处阶段
-            //     jnPartyTime:'20180516',//党员增加时间
+            //     jnPartyTime:'',//党员增加时间
             //     addParty:'1',//党员增加
             //     honour:'东北大学一等奖学金',//个人荣誉
             //     bedroom:'3舍A231',//寝室
             //     duty:'班长',//职务
-            //     partyDuty:'支部书记',//党内职务
-            //     branch:'1',//所在支部
+            //     partyDuty:'宣传委员',//党内职务
+            //     // branch:'1',//所在支部
+            //     branch:'第一党支部',//所在支部
                 
             //     pTeacher:'李福',//培养联系人
             //     leader:'上官云',//入党介绍人
@@ -1103,36 +754,36 @@ let dataFun = (function(){
             
             
             //     // 申请入党阶段
-            //     applyTime:'20190920',//申请入党时间
+            //     applyTime:'20180112',//申请入党时间
             //     talkTime:'20191005',//谈心谈话时间
             
             //     //入党积极分子的确定和培养阶段
             //     electLeagueTime:'20191025',//团推优时间
-            //     actvTime:'2020051',//确定积极分子时间
-            //     actvTrainTime:['20200708','20200801'],//积极分子培训时间
-            //     actvTrainResult:'1',//积极分子培训班结业情况
+            //     actvTime:'20180511',//确定积极分子时间
+            //     actvTrainTime:['20180708','20180801'],//积极分子培训时间
+            //     actvTrainResult:'2',//积极分子培训班结业情况
             
             //     //发展对象的确定和考察阶段
-            //     devTime:'20201201',//确定发展对象时间
-            //     devTrainTime:['20210201','20210302'],//发展对象培训时间
-            //     devTrainResult:'1',//发展对象培训班结业情况
+            //     devTime:'20181201',//确定发展对象时间
+            //     devTrainTime:['20180201','20180302'],//发展对象培训时间
+            //     devTrainResult:'2',//发展对象培训班结业情况
             //     classRank:'6',//业务课排名
             //     extFileTime:'20210412',//外调材料日期
             //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'20210402',//拟发展时间
+            //     candidateTime:'202104',//拟发展时间
             //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20180501','20180902'],//公示日期
+            //     pubTime:['20180201','20180302'],//公示日期
             
             //     // 预备党员的接收阶段
-            //     jnTime:'20210502',//入党时间
+            //     jnTime:'20180502',//入党时间
             //     aPartyCheckTime:'20210503',//入党总支审查日期
             //     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
             //     hPartyPassTime:'20210505',//入党上级党委审批日期
                 
                 
             //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20210506',//转正时间
-            //     letterTime:'20200110',//转正申请书时间
+            //     confirmTime:'20180506',//转正时间
+            //     letterTime:'20210910',//转正申请书时间
             //     partyConfirmTime:'20210506',//转正总支审查日期
             //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
             //     delayReadyTime:'20210508',//延长预备期日期
@@ -1145,27 +796,29 @@ let dataFun = (function(){
             // },
 
             // {
-            //     stuId:"1871260",//学号
-            //     name:'周溙',//姓名
+            //     stuId:"1571232",//学号
+            //     name:'赵亮',//姓名
             //     gender:'2',//性别
             //     phone:'123415',//联系方式
-            //     national:'1',//民族
+            //     national:'2',//民族
             //     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
             //     idCard:'13141414',//身份证
-            //     birthday:'19950102',//出生日期
+            //     birthday:'19950112',//出生日期
             //     grade:'19级',//年级
-            //     tclass:'1902班',//班级
+            //     tclass:'1901班',//班级
+            //     stuState:'2',//学籍状态
+            //     major:'软件工程',//专业
             //     proED:'1',//学历
-            //     tutor:'张李',//导师
+            //     tutor:'于师傅',//导师
             //     stage:'1',//所处阶段
-            //     jnPartyTime:'20201016',//党员增加时间
+            //     jnPartyTime:'20210516',//党员增加时间
             //     addParty:'2',//党员增加
             //     honour:'东北大学一等奖学金',//个人荣誉
             //     bedroom:'3舍A231',//寝室
             //     duty:'班长',//职务
-            //     partyDuty:'支部书记',//党内职务
-            //     branch:'1',//所在支部
-                
+            //     partyDuty:'组织委员',//党内职务
+            //     // branch:'1',//所在支部
+            //     branch:'第二党支部',//所在支部
             //     pTeacher:'李福',//培养联系人
             //     leader:'上官云',//入党介绍人
             //     applyFileNumber:'13415',//入党志愿书编号
@@ -1188,9 +841,9 @@ let dataFun = (function(){
             //     classRank:'6',//业务课排名
             //     extFileTime:'20210412',//外调材料日期
             //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'20210402',//拟发展时间
+            //     candidateTime:'202104',//拟发展时间
             //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20190201','20190302'],//公示日期
+            //     pubTime:['20210201','20210302'],//公示日期
             
             //     // 预备党员的接收阶段
             //     jnTime:'20210502',//入党时间
@@ -1200,8 +853,8 @@ let dataFun = (function(){
                 
                 
             //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20210506',//转正时间
-            //     letterTime:'20210610',//转正申请书时间
+            //     confirmTime:'20190506',//转正时间
+            //     letterTime:'20190910',//转正申请书时间
             //     partyConfirmTime:'20210506',//转正总支审查日期
             //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
             //     delayReadyTime:'20210508',//延长预备期日期
@@ -1211,76 +864,8 @@ let dataFun = (function(){
             
             //     note:'信息好多，代码好长',//备注
             
-            // },
+            // }
 
-            // {
-            //     stuId:"1875894",//学号
-            //     name:'吴使',//姓名
-            //     gender:'1',//性别
-            //     phone:'123415',//联系方式
-            //     national:'3',//民族
-            //     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-            //     idCard:'13141414',//身份证
-            //     birthday:'19950102',//出生日期
-            //     grade:'19级',//年级
-            //     tclass:'1902班',//班级
-            //     proED:'1',//学历
-            //     tutor:'张李',//导师
-            //     stage:'1',//所处阶段
-            //     jnPartyTime:'20200525',//党员增加时间
-            //     addParty:'3',//党员增加
-            //     honour:'东北大学一等奖学金',//个人荣誉
-            //     bedroom:'3舍A231',//寝室
-            //     duty:'班长',//职务
-            //     partyDuty:'支部书记',//党内职务
-            //     branch:'1',//所在支部
-                
-            //     pTeacher:'李福',//培养联系人
-            //     leader:'上官云',//入党介绍人
-            //     applyFileNumber:'13415',//入党志愿书编号
-            
-            
-            //     // 申请入党阶段
-            //     applyTime:'20190920',//申请入党时间
-            //     talkTime:'20191005',//谈心谈话时间
-            
-            //     //入党积极分子的确定和培养阶段
-            //     electLeagueTime:'20191025',//团推优时间
-            //     actvTime:'2020051',//确定积极分子时间
-            //     actvTrainTime:['20200708','20200801'],//积极分子培训时间
-            //     actvTrainResult:'1',//积极分子培训班结业情况
-            
-            //     //发展对象的确定和考察阶段
-            //     devTime:'20201201',//确定发展对象时间
-            //     devTrainTime:['20210201','20210302'],//发展对象培训时间
-            //     devTrainResult:'1',//发展对象培训班结业情况
-            //     classRank:'6',//业务课排名
-            //     extFileTime:'20210412',//外调材料日期
-            //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'20210402',//拟发展时间
-            //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20200201','20200302'],//公示日期
-            
-            //     // 预备党员的接收阶段
-            //     jnTime:'20210502',//入党时间
-            //     aPartyCheckTime:'20210503',//入党总支审查日期
-            //     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-            //     hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-            //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20210506',//转正时间
-            //     letterTime:'20210912',//转正申请书时间
-            //     partyConfirmTime:'20210506',//转正总支审查日期
-            //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
-            //     delayReadyTime:'20210508',//延长预备期日期
-            //     delayCheckTime:'20210508',//延长预备期总支审查日期
-            //     delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-            //     note:'信息好多，代码好长',//备注
-            
-            // },
         ],
         branchs:[
             // {id:1,branch:'第一党支部',regCandidate:'11',reParty:'12',graCandidate:'5',graParty:'12',docCandidate:'8',docParty:'15',actv:'13',applyer:'9',leader:'张三'},
@@ -1386,5 +971,5 @@ var downLoadTemp = {
     note:'信息好多，代码好长',//备注
 
 };
-// console.log('person',person);
+
 

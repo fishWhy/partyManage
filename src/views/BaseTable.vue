@@ -56,15 +56,17 @@
                         </div>
                     </div>
 
-                    <div class="pagination" style="margin:12px 0 4px 0">
+                    <div  style="margin:12px 0 4px 0">
                         <el-pagination
+                            class="pagination"
                             background
-                            layout="total, prev, pager, next"
+                            layout="total, sizes, prev, pager, next"
                             :current-page="showDate.pageIndex"
+                            :page-sizes="showDate.pageSizes"
                             :page-size="showDate.pageSize"
                             :total="showDate.itemTotal"
                             @current-change="currentPageChange"
-                           
+                            @size-change="handleSizeChange"
                         ></el-pagination>
                     </div>
 
@@ -235,6 +237,7 @@ export default {
     },
     activated(){
         this.getData();
+        this. formList = getFormList();
         //由于页面没有调用this.$nextTick，因此在重新得到数据后要设置一下selectedItem
         for(let i=0;i<this.showDate.tableDateShow.length;i++){
             if(this.selectedItem[this.showDate.tableDateShow[i].stuId]){
@@ -249,10 +252,38 @@ export default {
     },
     data() {
         return {
-
             formList: '',
             formData:'',
             activeName:'apply',
+            
+
+
+            id: -1,
+
+           
+
+            //文件导出
+            listTitle:[],
+            tableTitle:[],
+
+            exportVisible:false,
+            exExcle:'1',
+            transferData:'',
+            baseTransfer:[],
+
+            //文件导入
+            fileTemp:'',
+            file:'',
+            fileList:[],
+
+            //添加新数据
+            addVisible:false,
+
+            //导入Excel
+            importVisible: false,
+            // maxNumFile:10,
+
+            
             //筛选/搜索数据时的条件
             query: {
                 // baseForm
@@ -287,37 +318,9 @@ export default {
 
                 political:'',
 
-                pageIndex:1
+                pageIndex:1,
+                pageSize:30,
             },
-
-
-            id: -1,
-
-           
-
-            //文件导出
-            listTitle:[],
-            tableTitle:[],
-
-            exportVisible:false,
-            exExcle:'1',
-            transferData:'',
-            baseTransfer:[],
-
-            //文件导入
-            fileTemp:'',
-            file:'',
-            fileList:[],
-
-            //添加新数据
-            addVisible:false,
-
-            //导入Excel
-            importVisible: false,
-            // maxNumFile:10,
-
-            
-            
 
             //从后台获取的关于当前页面的所有数据
             tableData: [],
@@ -326,8 +329,9 @@ export default {
             showDate:{
                 tableDateShow:[],
                 pageIndex:1,
-                pageSize:1,
+                pageSize:30,
                 itemTotal:1,
+                pageSizes:[20,30,50,100],
             },
 
 
@@ -362,19 +366,34 @@ export default {
             this.getData();
             this. formList = getFormList();
             console.log("formList:",this.formList);
+            this.$nextTick(()=>{//因为在created中涉及到操作DOM即this.$message，所以需要使用this.$nextTick
+                this.$message({
+                    type:'success',
+                    message: "拉取数据成功"
+                });
+            });
+        },()=>{
+            this.$nextTick(()=>{
+                this.$message({
+                    type:'error',
+                    message: "拉取数据失败"
+                });
+            })
         });
 
 
     },
-    
-    watch:{
-        formData:{
-            handle:function(){
-                this. formList = getFormList();
-            },
-            deep:true
+    computed:{
+        pageSize(){
+            return this.showDate.pageSize;
         }
     },
+    
+    // watch:{
+    //     pageSize(newValue){
+    //         console.log('watched newValue of pageSize:',newValue)
+    //     }
+    // },
 
     methods: {
         // 获取 easy-mock 的模拟数据
@@ -382,20 +401,18 @@ export default {
             
             // this.query.indexPage = 0;
             // console.log('fetchData:',searchObj);
+            searchObj.pageIndex = this.showDate.pageIndex;
+            searchObj.pageSize = this.showDate.pageSize;
             
             let res = await fetchData(searchObj);
             // console.log('res:',res)
 
             //对返回的 res.list 数据进行转换,即将
             this.showDate.tableDateShow = dateTranfer(res.list);
-            // this.showDate.tableDateShow = res.list;
-
-
-            //
-
-            this.showDate.pageIndex = res.pageIndex;
-            this.showDate.pageSize = res.pageSize;
             this.showDate.itemTotal = res.itemTotal;
+
+
+            // console.log('the selectedItem:',this.selectedItem);
 
             
 
@@ -412,15 +429,24 @@ export default {
 
         //改变当前页时，回调
         currentPageChange(val){
-            this.query.pageIndex = val;
+            this.showDate.pageIndex = val;
             //this.selectedItemLock起到加锁的作用，防止在更改表格数据时触发该函数，误更改this.selectedItem
             this.selectedItemLock = true;
             this.getData(this.query);
 
         },
+        // 改变每页显示数量
+        handleSizeChange(val){
+            console.log(`每页${val}条`);
+             this.showDate.pageSize = val;
+            //this.selectedItemLock起到加锁的作用，防止在更改表格数据时触发该函数，误更改this.selectedItem
+            this.selectedItemLock = true;
+            this.getData(this.query);
+        },
         
         // 多选操作
         handleSelectionChange(val) {
+            // console.log('select more 多选操作被触发',this.selectedItemLock);
             //this.selectedItemLock起到加锁的作用，防止在更改表格数据时触发该函数，误更改this.selectedItem
             if(this.selectedItemLock) return;
 
@@ -456,6 +482,7 @@ export default {
                 }
                 obj.id = this.searchQuery;
                 this.getData(obj);
+                this.$nextTick(()=>this. formList = getFormList());
                 this.$message.success(`删除id为 ${val.stuId} 的同学的信息成功`);
 
             }
@@ -486,6 +513,7 @@ export default {
 
                 //重新获取数据
                 this.getData(this.query);
+                this.$nextTick(()=>this. formList = getFormList());
                 this.$message.success(`${str}被成功删除`)
 
 
@@ -698,7 +726,13 @@ export default {
         deleteAllUpload(){
             this.$refs.el_upload_314.clearFiles();
             this.fileList = null;
-        }
+        },
+
+        backToLogin(){
+            this.$router.push({path:'/login'});
+        },
+
+        
       
         
     }

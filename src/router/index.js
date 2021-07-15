@@ -186,21 +186,19 @@ router.beforeEach((to, from, next) => {
     // }else{
     //     next();
     // }
-    console.log('from:',from);
+    // console.log('from:',from);
     // console.log('to:',to);
     // console.log(vuex.state);
-
-    if(to.name =='selfForm'){
-        next();
-        // return;
-    }else if((from.name==='login')&&(vuex.state.role.role=="student")){
-        // next('/selfForm');
-        next({name:'selfForm'});
-        
-    }else{
-        next();
+    
+    
+    if(to.name == 'login'){
+        vuex.commit('clearAll');
     }
-
+    if(to.name!=='login' && !vuex.getters.token){
+        console.log('no token push  vue-router to login');
+        next('/login');
+        return;
+    }
     next();
 
 

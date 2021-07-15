@@ -153,22 +153,20 @@ export default {
         submitForm() {
             this.$refs.login.validate(valid => {
                 if (valid) {
-                    // requestData('/login',this.param,'post').then((item)=>{
-                    //     console.log('item:',item);
-                    //     localStorage.setItem("token", item.data.token);
-                    //     localStorage.setItem("stuId", item.data.user.stu_id);
-                    // });
-                    
 
-                    logIn(this.param).then((duty)=>{
+                    logIn(this.param).then((_data)=>{
                         // this.$router.push("/home/table");
-                        let stuId = this.param.userName
-                        if(duty>1){
-                            this.$store.commit('setRole',{stuId:stuId, role:'teacher'})
+                        let stuId = _data.user.stu_id, token = _data.token;
+
+
+                        if(_data.duty>1){
+                            this.$store.commit('setRole',{stuId:stuId, role:'manager',token:token})
+                            this.$router.push({path:'/home/table'});
                         }else{
-                            this.$store.commit('setRole',{stuId:stuId, role:'student'})
+                            this.$store.commit('setRole',{stuId:stuId, role:'user',token:token})
+                            this.$router.push({path:'/selfForm'});
                         }
-                        this.$router.push({path:'/home/table'});
+                        
                         this.$message.success("登录成功");
                     },(item)=>{
                         console.log('login err:',item);

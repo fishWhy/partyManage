@@ -13,6 +13,7 @@
         "element-china-area-data": "^5.0.2",
         "element-plus": "~1.0.2-beta.33",
         "file-saver": "^2.0.5",
+        "mitt": "^3.0.0",
         "vue": "~3.0.7",
         "vue-cropperjs": "^5.0.0",
         "vue-i18n": "^9.0.0",

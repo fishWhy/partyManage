@@ -86,7 +86,7 @@ export default {
     //     console.log('actvStage')
     // },
     unmounted(){
-        console.log('destroy:',this.path);
+        console.log('destroy BaseForm:',this.path);
         // this.person = {};
 
     },

@@ -26,6 +26,12 @@ export default {
         vSidebar,
         vTags
     },
+    mounted(){
+        this.$message({
+            type:'warning',
+            message: "正在拉取数据请耐心等待"
+        });
+    },
     computed: {
         // include(){
         //     let tagsList = this.$store.state.tagsList;

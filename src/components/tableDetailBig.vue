@@ -8,7 +8,7 @@
             <el-form-item v-for='item in formObj' :label="item.label" :key='item.prop' style="margin-top:6px;" :class="{blockClass:item.type==='textarea',itemClass:item.redLabel == true,br:item.type==='br'}" >
                 <div style="display:inline-block;width:180px;">
                     <!-- 输入框 -->
-                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" @change="changeDate"></el-input>
+                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" :disabled="disabled" @change="changeDate" :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-input>
                      <!-- 输入框 textarea -->
                     <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" :disabled="disabled" v-model="dateItems[item.prop]"></el-input>
                     <!-- 下拉框 -->

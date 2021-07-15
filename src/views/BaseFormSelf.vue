@@ -113,13 +113,33 @@ export default {
             this.candidateStage = this.tableForm.candidateStage;// 预备党员的接收阶段
             this.positiveStage = this.tableForm.positiveStage;// 预备党员的教育考察和转正阶段
             this.setFormData();
-            this.$nextTick(()=>this.markLabel());
+            console.log('this.person:',_data);
+            this.$nextTick(()=>{
+                this.markLabel();
+                this.$message({
+                    type:'success',
+                    message: "拉取数据成功"
+                });
+            });
+            
+        },()=>{
+            this.$nextTick(()=>{
+                this.$message({
+                    type:'error',
+                    message: "拉取数据失败"
+                });
+            })
         })
 
         
     },
     mounted(){
         this.markLabel();
+        this.$message({
+            type:'warning',
+            message: "正在拉取数据请耐心等待"
+        });
+
     },
 
     data() {
@@ -578,11 +598,10 @@ export default {
                 //     this.$message({type:'error',message:'申请入党时必须在18周岁以上'});
                 //     return;
                 // }
-
+                // console.log('before update')
                 //将数据提交给后台
                 await cInfor(nData);
-
-
+                // console.log('after update')
                 this.$message.success(`保存id为 ${nData.stuId} 的同学的信息成功`);
 
             }catch(e){

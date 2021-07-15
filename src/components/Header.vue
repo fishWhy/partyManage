@@ -6,6 +6,11 @@
             <i v-else class="el-icon-s-unfold"></i>
         </div>
         <div class="logo">党员信息管理系统</div>
+        <div class="header-right">
+            <div style="display: flex;height: 70px;align-items: center;">
+                <el-button type="primary" size="mini" @click="backToLogin">退出登录</el-button>
+            </div>
+        </div>
         <!-- <div class="header-right">
             <div class="header-user-con"> -->
                 <!-- 消息中心 -->
@@ -63,6 +68,10 @@ export default {
         }
     },
     methods: {
+        //退出当前页，返回到登录页
+        backToLogin(){
+            this.$router.push({path:'/login'});
+        },
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == "loginout") {

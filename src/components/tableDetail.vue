@@ -10,7 +10,7 @@
                 <div style="display:inline-block;width:160px;">
                     <br v-if="item.type==='br'"/>
                     <!-- 输入框 Input -->
-                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]" class="el_side_style" :disabled="disabled" @change="changeDate"></el-input>
+                    <el-input v-if="item.type==='Input'" v-model="dateItems[item.prop]"  :disabled="disabled" @change="changeDate"  :class="{el_side_style: !item.styleObj}" :style = "[item.styleObj]"></el-input>
                     <!-- 输入框 textarea -->
                     <el-input  v-if="item.type==='textarea'" type="textarea"  class="el_area_style" resize="none" :disabled="disabled" v-model="dateItems[item.prop]"></el-input>
 

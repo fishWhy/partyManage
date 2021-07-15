@@ -8,12 +8,33 @@ export default createStore({
         role:{},
         delTags:{},//存储当前要关闭的页面
     },
-    mutations: {
-        setRole(state,_role){
-            state.role.stuId = _role.stuId;
-            state.role.role = _role.role;
+    getters:{
+        token:function(state){
+            return state.role.token;
         },
-        clearAllRole(){},
+        stuId:function(state){
+            return state.role.stuId;
+        },
+        duty:function(state){
+            return state.role.duty
+        }
+    },
+    mutations: {
+        setRole(state,obj){
+            state.role.stuId = obj.stuId;
+            state.role.role = obj.role;
+            state.role.token = obj.token;
+        },
+        clearAllRole(state){
+            state.role = {};
+        },
+        clearAll(state){
+            state.tagsList = [];
+            state.collapse = true;
+            state.baseTable = {};
+            state.role = {};
+            state.delTags = {};
+        },
         delDelTags(state,data){
             for(let i=state.delTags.length-1;i>=0;i--){
                 if(state.delTags[i].path == data.path){

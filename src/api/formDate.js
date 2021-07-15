@@ -196,7 +196,7 @@ let tableDetail = [
     {label:'出生日期',prop:'birthday',type:'YMR'},
     {label:'民族',prop:'national',type:'Select',options:[]},
     {label:'籍贯',prop:'home',type:'pcc'},
-    {label:'身份证',prop:'idCard',type:'Input'},
+    {label:'身份证',prop:'idCard',type:'Input',styleObj:{'width':'300px!important;'}},
     {label:'学号',prop:'stuId',type:'Input'},
     {label:'联系方式',prop:'phone',type:'Input'},
     {label:'学历',prop:'proED',type:'Select',options:[]},
