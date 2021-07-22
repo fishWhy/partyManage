@@ -10,7 +10,7 @@ let formDate = {
     isApplay:{0:'全部',1:'是',2:'否'},
     actvTrainResult:{0:'全部',1:'通过',2:'不通过'},
     devTrainResult:{0:'全部',1:'通过',2:'不通过'},
-    partyDuty:{0:'全部',1:'普通党员',2:'宣传委员',3:'组织委员',4:'党支部书记',5:'管理员',"-1":'其他'},
+    partyDuty:{0:'全部',1:'普通党员',2:'宣传委员',3:'组织委员',4:'党支部书记',"-1":'其他'},
     stuState:{0:'全部',1:'在读',2:'已毕业'}
 }
 
@@ -19,8 +19,12 @@ function insertFormDateToBranch(attri,obj){
     if( typeof obj == 'string'){
         let temptArr = obj.split(','),inObj = {};
         inObj["0"] = "全部";
+        
         for(let i=0;i<temptArr.length;i++){
-            inObj[temptArr[i]] = temptArr[i];
+            // console.log('temptArr',temptArr[i]);
+            if(temptArr[i]!='其他'){
+                inObj[temptArr[i]] = temptArr[i];
+            }
         }
         if(attri == "branch"){inObj["其他"] ="其他"}
         formDate[attri] = inObj;
@@ -75,20 +79,21 @@ function dateTranfer(list){
             }
 
         })
-        // 是党员，但党内职务为空时，党内职务置为 普通党员
-        if(!list[i]["partyDuty"] && (list[i]['stage']=="正式党员"||list[i]['stage']=="5")){
-            list[i]["partyDuty"] = "1";
-            console.log('partyDuty');
-        }
-        // 党内职务为空 或 非正式党员时，党内职务置为 无
-        if(!list[i]['partyDuty'] || (list[i]['stage']!="正式党员" && list[i]['stage']!="5")){
-            list[i]["partyDuty"] = "-1";
-        }
+        
+        // // 是党员，但党内职务为空时，党内职务置为 普通党员
+        // if(!list[i]["partyDuty"] && (list[i]['stage']=="正式党员"||list[i]['stage']=="5")){
+        //     list[i]["partyDuty"] = "1";
+        //     console.log('partyDuty');
+        // }
+        // // 党内职务为空 或 非正式党员时，党内职务置为 无
+        // if(!list[i]['partyDuty'] || (list[i]['stage']!="正式党员" && list[i]['stage']!="5")){
+        //     list[i]["partyDuty"] = "-1";
+        // }
 
-        //所处阶段为空 所处阶段置为  党外人士
-        if(!list[i]['stage']){
-            list[i]['stage'] = "-1";
-        }
+        // //所处阶段为空 所处阶段置为 其他
+        // if(!list[i]['stage']){
+        //     list[i]['stage'] = "-1";
+        // }
 
         
 

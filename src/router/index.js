@@ -2,7 +2,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Home from "../views/Home.vue";
 
-import vuex from "../store/index.js"
+// import vuex from "../store/index.js"
 
 const routes = [
     {
@@ -191,10 +191,14 @@ router.beforeEach((to, from, next) => {
     // console.log(vuex.state);
     
     
-    if(to.name == 'login'){
-        vuex.commit('clearAll');
-    }
-    if(to.name!=='login' && !vuex.getters.token){
+    // if(to.name == 'login'){
+    //     vuex.commit('clearAll');
+    // }
+    // console.log('from name:',from.name);
+    // console.log('to name:',to.name);
+    // console.log('token:',localStorage.getItem('token'));
+
+    if(to.name!=='login' && !localStorage.getItem('token')){
         console.log('no token push  vue-router to login');
         next('/login');
         return;

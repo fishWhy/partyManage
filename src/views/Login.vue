@@ -124,29 +124,30 @@ export default {
             paRules: {
                 userName: [
                     { required: true, message: "请输入正确的学号",  trigger: "blur" },
-                    {min:4,max:10,message:'长度在4到10位的数字'},
-                    {pattern:/^[0-9]{4,10}$/,message:'用户名只能是数字'}
+                    {min:6,max:10,message:'长度在6到10位的数字'},
+                    {pattern:/^[0-9]{6,10}$/,message:'用户名只能是数字'}
                 ],
                 password: [
                     { required: true, message: "请输入正确的老密码", trigger: "blur" },
-                    {min:4,max:10,message:'长度在4到10位'},
-                    {pattern:/^[a-zA-Z\d]{4,10}$/,message:'密码只能是数字和大小写字母'}
+                    {min:6,max:10,message:'长度在6到10位'},
+                    {pattern:/^[a-zA-Z\d]{6,10}$/,message:'密码只能是数字和大小写字母'}
                 ],
                 nPassword:[
                     { required: true, message: "请输入正确格式的新密码",trigger: "blur" },
-                    {min:4,max:10,message:'长度在4到10位'},
-                    {pattern:/^[a-zA-Z\d]{4,10}$/,message:'密码只能是数字和大小写字母'}
+                    {min:6,max:10,message:'长度在6到10位'},
+                    {pattern:/^[a-zA-Z\d]{6,10}$/,message:'密码只能是数字和大小写字母'}
                 ],
                 confirmNPassword: [
                     { required: true, message: "请再次输入正确格式的新密码以验证",trigger: "blur" },
-                    {min:4,max:10,message:'长度在4到10位'},
-                    {pattern:/^[a-zA-Z\d]{4,10}$/,message:'密码只能是数字和大小写字母'}
+                    {min:6,max:10,message:'长度在6到10位'},
+                    {pattern:/^[a-zA-Z\d]{6,10}$/,message:'密码只能是数字和大小写字母'}
                 ]
             },
 
         };
     },
     created() {
+        localStorage.clear();
         this.$store.commit("clearTags");
     },
     methods: {
@@ -160,12 +161,17 @@ export default {
 
 
                         if(_data.duty>1){
-                            this.$store.commit('setRole',{stuId:stuId, role:'manager',token:token})
+                            this.$store.commit('setRole',{stuId:stuId, role:'manager',token:token});
+                            localStorage.setItem('stuId',stuId);
+                            localStorage.setItem('token',token);
                             this.$router.push({path:'/home/table'});
                         }else{
                             this.$store.commit('setRole',{stuId:stuId, role:'user',token:token})
+                            localStorage.setItem('stuId',stuId);
+                            localStorage.setItem('token',token);
                             this.$router.push({path:'/selfForm'});
                         }
+
                         
                         this.$message.success("登录成功");
                     },(item)=>{

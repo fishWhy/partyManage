@@ -668,9 +668,9 @@ let dataFun = (function(){
             try{
                 _data = await importfxx(fileList[i].raw, filesObj.listTitle,filesObj.tableTitle);
                 
-                // console.log("beforeStyle:",_data)
+                console.log("beforeStyle:",_data)
                 _data = loadDateStyle(_data);
-                // console.log("afterStyle:",_data);
+                console.log("afterStyle:",_data);
                 tableArray = tableArray.concat(_data);
                 tableArray = arrUni(tableArray);
                 // console.log('tableArray:',tableArray);
@@ -698,14 +698,32 @@ let dataFun = (function(){
                 if(Object.prototype.hasOwnProperty.call(item,k)){
                 //》》》》这里其实涉及到一个问题，我们通过importfxx从表格获取的数据不一定都是字符串类型的数据，
                     item[k] = item[k]+'';
-                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime')&&(typeof item[k]=='string' && item[k].length>0)){
+                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'||k==='home')&&(typeof item[k]=='string' && item[k].length>0)){
                         
                         arr = item[k].split(',');
                         item[k] = arr;
 
                     }
+                    
+                   
                 }
             }
+            if(!item['partyDuty'] && item['stage']=="正式党员"){
+                item['partyDuty'] = '普通党员';
+            }
+            if(!item['partyDuty'] || item['stage']!="正式党员"){
+                item['partyDuty'] = '其他';
+            }
+            if(!item['stage']){
+                item['stage'] = "其他";
+            }
+
+            // 将导入的数据做补充
+            // 如果branch为空，就将_$ 变成其他
+            if(!item['branch']){
+                item['branch'] = '其他';
+            } 
+
         }
 
         return addressToPtd(dateBack(list));

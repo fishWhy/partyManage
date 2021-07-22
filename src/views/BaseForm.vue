@@ -16,7 +16,7 @@
                     <el-container class="inforContainer" style="border-top: 1px solid black;">
                         <el-header width="80px" class="inforHead"><el-tag type="success" style="font-size:14px;" >基本信息</el-tag></el-header>
                         <el-main class="inforMain">
-                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="status==2?false:true" ref="tableDetail" @changeDate="markLabel"></table-detail>
+                            <table-detail  :formObj="tableDetail" :content="detailContent" :disabled="disabled" ref="tableDetail" @changeDate="markLabel"></table-detail>
                         </el-main>
                     </el-container>
 

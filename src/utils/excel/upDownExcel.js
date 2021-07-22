@@ -37,7 +37,7 @@ function importfxx(obj,listTitle,tableTitle) {
                             type: 'binary'
                     });
                     
-                    var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'###$###'});//outdata就是你想要的东西
+                    var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});//outdata就是你想要的东西
                     // console.log('the data:',data);
                     
                     var _data = [];
