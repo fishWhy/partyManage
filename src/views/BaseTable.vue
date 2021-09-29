@@ -217,16 +217,62 @@
 
 
 
+        <!-- 导入excel后，显示导入成功或失败的列表 -->
+        <el-dialog title="导入Excel" v-model="afterImpDialog.visible" width="640px" >
+            <div id="elD_315">
+                <div>
+                    <el-container >
+                        <el-header  height="30px"><el-button type="primary" size="small" style="margin-right:15px">导入失败列表</el-button> 共有{{impFailNum}}人</el-header>
+                        <el-main style="max-height:300px;padding-top:9px;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
+                            <el-scrollbar>
+                                  <div v-for="(item, index) in afterImpDialog.failList" :key="index">
+                                        <el-row :gutter="20" style="margin-bottom:10px;" :justify="center" :align="middle">
+                                            <el-col :span="6" v-for="(failListval,idx) in item" :key="idx" style="height:30px"><div class="grid-content bg-purple">{{failListval}}</div></el-col>
+                                        </el-row>
+                                  </div>
+                            </el-scrollbar> 
+                        </el-main>
+                    </el-container>
+                </div>
+                 <div >
+                    <el-container >
+                        <el-header  height="30px"><el-button type="primary" size="small" style="margin-right:15px">导入成功列表</el-button> 共有{{impSuccessNum}}人</el-header>
+                        <el-main style="max-height:300px;padding-top:9px;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
+                            <el-scrollbar style="100%">
+                                  <div v-for="(item, index) in afterImpDialog.successList" :key="index">
+                                        <el-row :gutter="20" style="margin-bottom:10px;" :justify="center" :align="middle">
+                                            <el-col :span="6" v-for="(failListval,idx) in item" :key="idx" style="height:30px"><div class="grid-content bg-purple">{{failListval}}</div></el-col>
+                                        </el-row>
+                                  </div>
+                            </el-scrollbar> 
+                        </el-main>
+                    </el-container>
+                </div>
+
+                
+            </div>
+            
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="closeShowEld1">确 定</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+
+
     </div>
 </template>
 
 <script>
 // import { fetchData,setNewData } from "../api/index";
 import {addDate,deltDate,fetchData,downDate,loadDateFromExcel,getStartDataFromBackend} from "../api/index";
-import {getFormList,dateTranfer,listMap,formDate} from "../api/formDate.js"
+import {getFormList,listMap,formDate} from "../api/formDate.js"
 // 
 // import el_dialog from "../components/el_dialog.vue"
 import searchForm from "../components/searchForm.vue"
+
+// import bus from '../api/bus.js'
 
 
 export default {
@@ -282,6 +328,18 @@ export default {
             //导入Excel
             importVisible: false,
             // maxNumFile:10,
+
+
+            afterImpDialog:{
+                visible:false,
+                    failList:[],
+                    // [["张辉，194141","李羊，47104814","不打发发，1324143","易方达宽度，1341414"],]
+                    successList:[]
+
+
+                        
+                // failList:[1,2,3,4,5,6,7,8,9,10,11,],
+            },
 
             
             //筛选/搜索数据时的条件
@@ -362,6 +420,8 @@ export default {
         });
         this.transferData = this.attriShow;
 
+
+
         getStartDataFromBackend().then(()=>{
             this.getData();
             this. formList = getFormList();
@@ -372,7 +432,8 @@ export default {
                     message: "拉取数据成功"
                 });
             });
-        },()=>{
+        },(err)=>{
+            console.log('err:',err)
             this.$nextTick(()=>{
                 this.$message({
                     type:'error',
@@ -386,6 +447,20 @@ export default {
     computed:{
         pageSize(){
             return this.showDate.pageSize;
+        },
+        impSuccessNum(){
+            let num = 0;
+            for(let i=0;i<this.afterImpDialog.successList.length;i++){
+                num = num + this.afterImpDialog.successList[i].length;
+            }
+            return num;
+        },
+        impFailNum(){
+            let num = 0;
+            for(let i=0;i<this.afterImpDialog.failList.length;i++){
+                num = num + this.afterImpDialog.failList[i].length;
+            }
+            return num;
         }
     },
     
@@ -395,7 +470,19 @@ export default {
     //     }
     // },
 
+
+
     methods: {
+        transToListShow(list){
+            list = JSON.parse(JSON.stringify(list));
+            for(let i=0, item;i<list.length;i++){
+                item = list[i];
+                for(let k in item){
+                    item[k] = formDate.tranferToValue(k, item[k]);
+                }
+            }
+            return list;
+        },
         // 获取 easy-mock 的模拟数据
         async getData(searchObj = this.query) {
             
@@ -408,7 +495,7 @@ export default {
             // console.log('res:',res)
 
             //对返回的 res.list 数据进行转换,即将
-            this.showDate.tableDateShow = dateTranfer(res.list);
+            this.showDate.tableDateShow = this.transToListShow(res.list);
             this.showDate.itemTotal = res.itemTotal;
 
 
@@ -690,14 +777,29 @@ export default {
                 // console.log('tableArray:',tableArray)
                 
                 try{
-                    let resDate = await addDate(tableArray);
-                    console.log("resDate:",resDate);
-                    if(Object.prototype.toString.call(resDate.failList) == "[object Array]" && resDate.failList.length>0){
-                        this.$message({
-                            type:'warning',
-                            message: "学号为"+resDate.failList.join(',')+"的学生信息添加失败"
-                    }   );
+                    let resDate = await addDate(tableArray,true);
+                    this.afterImpDialog.failList = [];
+                    this.afterImpDialog.successList = [];
+                    for(let i=0,arr=[],it;i<resDate.failList.length;i++){
+                        it = resDate.failList[i];
+                        arr.push(it.stuId+','+it.name);
+                        if(arr.length>=4 || i==resDate.failList.length-1){
+                            this.afterImpDialog.failList.push(arr.slice());
+                            arr = [];
+                        }
                     }
+                    for(let i=0,arr=[],it;i<resDate.successList.length;i++){
+                        it = resDate.successList[i];
+                        arr.push(it.stuId+','+it.name);
+                        if(arr.length>=4 || i==resDate.successList.length-1){
+                            this.afterImpDialog.successList.push(arr.slice());
+                            arr = [];
+                        }
+                    }
+
+                    console.log('afterImpDialog:',this.afterImpDialog)
+
+                    this.afterImpDialog.visible = true;
                     this. formList = getFormList();
 
                     //更新当前页面的内容
@@ -710,6 +812,17 @@ export default {
                             type:'warning',
                             message: "添加excel中获取的数据失败"
                     });
+                    this.afterImpDialog.failList = [];
+                    this.afterImpDialog.successList = [];
+                    for(let i=0,arr=[],it;i<e.failList.length;i++){
+                        it = e.failList[i];
+                        arr.push(it.stuId+','+it.name);
+                        if(arr.length>=4 || i==e.failList.length-1){
+                            this.afterImpDialog.failList.push(arr.slice());
+                            arr = [];
+                        }
+                    }
+                    this.afterImpDialog.visible = true;
                 }
 
                 
@@ -731,6 +844,10 @@ export default {
         backToLogin(){
             this.$router.push({path:'/login'});
         },
+
+        closeShowEld1(){
+            this.afterImpDialog.visible = false;
+        }
 
         
       
@@ -797,7 +914,16 @@ export default {
 }
 
 
-
+.bg-purple {
+  background: #d3dce6;
+}
+.grid-content {
+  border-radius: 4px;
+  min-height: 30px;
+  font-size:3px;
+  line-height: 30px;
+  text-align: center;
+}
 
 /* .ces-search{
     font-size: 10px;
@@ -926,5 +1052,7 @@ export default {
 #el_dialogExport314 .el-dialog__body{
     padding-top: 0;
 }
+
+
 
 </style>

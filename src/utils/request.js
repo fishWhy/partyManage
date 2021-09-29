@@ -6,10 +6,14 @@ const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
     // easy-mock服务挂了，暂时不使用了
     // baseURL: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
-    baseURL:'http://172.22.22.35:8080/api/internal',
+    // baseURL:'http://172.22.22.35:8080/api/internal',
     // baseURL:'http://lizhangjie.cn:8080/api/internal',
     // baseURL:'http://localhost:8080/api/internal',
-    // baseURL:'http://172.16.10.65:8080/api/internal',
+    
+    baseURL:'http://172.22.14.96:8080/api/internal',
+
+    // baseURL:'http://127.0.0.1:8080/api/internal',
+    
     // baseURL:'http://139.9.131.190:8080/api/internal',
     // headers: {'content-type': 'application/json'},
     // withCredentials: true,
@@ -58,8 +62,13 @@ service.interceptors.response.use(
         }
     },
     error => {
-        console.log('response error2:',error);
-        return Promise.reject();
+        let errMgs = error.toJSON();
+        console.log(' the response  error messages of network   after error.toJSON() from axios :',errMgs)
+        if (errMgs.code === 'ECONNABORTED' && errMgs.message.indexOf('timeout') !== -1) {
+            return Promise.reject('网络请求超时，请检查网络或重试')
+        }else{
+            return Promise.reject(error);
+        }
     }
 );
 

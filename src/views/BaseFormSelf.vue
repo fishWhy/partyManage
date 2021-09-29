@@ -104,7 +104,7 @@ export default {
 
         // 从后端得到个人信息
         getDataOfStuIdFromBN().then((_data)=>{
-            this.person = _data;
+            this.person = Object.assign(this.person, _data);
             this.tableForm = getTableForm();
             this.tableDetail = this.tableForm.tableDetail;//基本信息
             this.applyStage = this.tableForm.applyStage;//申请入党阶段

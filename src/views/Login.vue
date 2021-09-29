@@ -98,13 +98,16 @@
 
 <script>
 import {logIn,changePsw} from '../api/index.js'
+
 export default {
     data() {
         return {
             isLogin:true,
             param: {
                 userName: "00008612",
-                password: "123456"
+                password: "123456",
+                // userName: "",
+                // password: ""
             },
             rules: {
                 userName: [
@@ -158,8 +161,6 @@ export default {
                     logIn(this.param).then((_data)=>{
                         // this.$router.push("/home/table");
                         let stuId = _data.user.stu_id, token = _data.token;
-
-
                         if(_data.duty>1){
                             this.$store.commit('setRole',{stuId:stuId, role:'manager',token:token});
                             localStorage.setItem('stuId',stuId);
@@ -176,7 +177,7 @@ export default {
                         this.$message.success("登录成功");
                     },(item)=>{
                         console.log('login err:',item);
-                        this.$message.error("登录失败");
+                        this.$message.error(item+"");
                     });
 
                     // this.$router.push("/home/table");

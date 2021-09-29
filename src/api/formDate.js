@@ -1,9 +1,7 @@
-import {  CodeToText, TextToCode } from 'element-china-area-data/dist/app.commonjs';
-
 let formDate = {
     gender:{0:'全部',1:'男',2:'女'},
     national:{0:"全部",1:"汉族",2:"蒙古族",3:"回族",4:"藏族",5:"维吾尔族",6:"苗族",7:"彝族",8:"壮族",9:"布依族",10:"朝鲜族",11:"满族",12:"侗族",13:"瑶族",14:"白族",15:"土家族",16:"哈尼族",17:"哈萨克族",18:"傣族",19:"黎族",20:"傈僳族",21:"佤族",22:"畲族",23:"高山族",24:"拉祜族",25:"水族",26:"东乡族",27:"纳西族",28:"景颇族",29:"柯尔克孜族",30:"土族",31:"达斡尔族",32:"仫佬族",33:"羌族",34:"布朗族",35:"撒拉族",36:"毛难族",37:"仡佬族",38:"锡伯族",39:"阿昌族",40:"普米族",41:"塔吉克族",42:"怒族",43:"乌孜别克族",44:"俄罗斯族",45:"鄂温克族",46:"德昂族",47:"保安族",48:"裕固族",49:"京族",50:"塔塔尔族",51:"独龙族",52:"鄂伦春族",53:"赫哲族",54:"门巴族",55:"珞巴族",56:"基诺族",99:"其他"},
-    branch:{0:'全部',"其他":"其他"},
+    branch:{0:'全部'},
     addParty:{0:'全部',1:'新发展',2:'自本地(市、州、盟、区)直属的其他单位转入)',3:'自本省(区、市)内的其他地(市、州、盟、区)转入',4:'自本省(区、市)直属的其他单位转入',5:'自本系统内的其他单位转入',6:'自外省(区、市)转入',7:'其他'},
     proED:{0:'全部',1:'本科',2:'硕士研究生',3:'博士研究生',4:'其他'},
     stage:{0:'全部',1:'申请入党',2:'入党积极分子',3:'发展对象',4:'预备党员',5:'正式党员',"-1":'其他'},
@@ -11,27 +9,54 @@ let formDate = {
     actvTrainResult:{0:'全部',1:'通过',2:'不通过'},
     devTrainResult:{0:'全部',1:'通过',2:'不通过'},
     partyDuty:{0:'全部',1:'普通党员',2:'宣传委员',3:'组织委员',4:'党支部书记',"-1":'其他'},
-    stuState:{0:'全部',1:'在读',2:'已毕业'}
+    stuState:{0:'全部',1:'在读',3:'降级',4:'休学',5:'退学',2:'已毕业',}
 }
 
-function insertFormDateToBranch(attri,obj){
-    // console.log('insertFormDate:',obj,typeof obj);
-    if( typeof obj == 'string'){
-        let temptArr = obj.split(','),inObj = {};
-        inObj["0"] = "全部";
-        
-        for(let i=0;i<temptArr.length;i++){
-            // console.log('temptArr',temptArr[i]);
-            if(temptArr[i]!='其他'){
-                inObj[temptArr[i]] = temptArr[i];
+// 将下拉框选项的数据转成要显示的样式即转成1,2,3
+formDate.tranferToKey = function(item, val ){
+    if(this[item]){
+        for(let key  in this[item]){
+            if(this[item][key]==val){
+                return key;
             }
         }
-        if(attri == "branch"){inObj["其他"] ="其他"}
-        formDate[attri] = inObj;
-        // console.log('formDate:',formDate);
+        return val;
+    }else{
+        return val;
     }
-    
 }
+
+formDate.tranferToValue = function(item, key){
+    if(this[item]){
+        for(let k in this[item]){
+            if(key == k ){
+                return this[item][k]
+            }
+        }
+        return key;
+    }else{
+        return key;
+    }
+}
+
+formDate.setNewItemInFormDate = function(itemName, dataArray){
+    if(Array.isArray(dataArray)){
+        let itemObj = {};
+        itemObj['0'] = '全部';
+        let k = 1;
+        for(let item of dataArray){
+            if(item!=null && item!='_$' && item!='null' && item!='undefined' && item!='NaN'){
+                if(itemName=='branches' && (item.indexOf('支部')!=-1) ){continue;}// 如果不是以 支部 结尾就不用插入了
+                itemObj[k +''] = item;
+                k++;
+            }
+        }
+        this[itemName] = itemObj;
+    }
+}
+
+
+
 
 function inFormToNone(obj){
     Object.keys(formDate).forEach(item=>{
@@ -42,115 +67,8 @@ function inFormToNone(obj){
 
 }
 
-/**
- * 用来将对象数组list中的属性值由0,1变为对应的汉字，如gender:'1'，变为gender:'男'
- * @param {Array} list ,数组list中的每一项都为一个对象
- * @returns 
- */
-function dateTranfer(list){
-    for(let i=0;i<list.length;i++){
-        let obj = list[i];
-        Object.keys(obj).forEach((item)=>{
-            if(formDate[item]){
-                list[i][item] = formDate[item][list[i][item]];
-            }
-        })
-    }
-    return list;
-
-    
-}
-
-/**
- * 用来将对象数组list中的属性值由汉字变成对应数字，如gender:'男' 变为 gender:'1'
- * @param {Array} list ,数组list中的每一项都为一个对象
- * @returns 
- */
- function dateBack(list){
-    for(let i=0;i<list.length;i++){
-        let obj = list[i];
-        Object.keys(obj).forEach((item)=>{
-            if(formDate[item]){
-                Object.keys(formDate[item]).forEach(k=>{
-                    if(list[i][item] === formDate[item][k]){
-                        list[i][item] = k;
-                    }
-                });
-            }
-
-        })
-        
-        // // 是党员，但党内职务为空时，党内职务置为 普通党员
-        // if(!list[i]["partyDuty"] && (list[i]['stage']=="正式党员"||list[i]['stage']=="5")){
-        //     list[i]["partyDuty"] = "1";
-        //     console.log('partyDuty');
-        // }
-        // // 党内职务为空 或 非正式党员时，党内职务置为 无
-        // if(!list[i]['partyDuty'] || (list[i]['stage']!="正式党员" && list[i]['stage']!="5")){
-        //     list[i]["partyDuty"] = "-1";
-        // }
-
-        // //所处阶段为空 所处阶段置为 其他
-        // if(!list[i]['stage']){
-        //     list[i]['stage'] = "-1";
-        // }
-
-        
 
 
-    }
-    return list;
-}
-
-
-//省市区三级区域码转地址
-// 数组list中的每一项都为一个对象
-function ptdToAddress(list){
-    let rs = "";
-    console.log('地址：',CodeToText, TextToCode);
-
-    for(let i=0;i<list.length;i++){ 
-        //codeArr是一个长度为3的数组分别是省市区的区域码，["130000","130300","130303"]，这里会转成 河北省/秦皇岛市/山海关区
-        if(Object.prototype.hasOwnProperty.call(list[i],'home')){
-            let codeArr = list[i].home;
-            rs = "";
-
-            if(codeArr instanceof Array){
-                codeArr.forEach(item=>{
-                    //注意一定要有'/'，目的是为了方便导入表格
-                    rs += CodeToText[item]+"/";
-                })
-                rs = rs.slice(0,rs.length-1);
-            }
-            
-            list[i]['home'] = rs;
-        }
-        
-    }
-    return list;
-}
-// 将地址转成数组
-//省市区三级区地址转区域码，例如：河北省/秦皇岛市/山海关区 转成 ["130000","130300","130303"] 
-// 数组list中的每一项都为一个对象
-
-function addressToPtd(list){
-    let rs = [];
-
-    for(let i=0;i<list.length;i++){ 
-        if((Object.prototype.hasOwnProperty.call(list[i],'home'))&&(typeof list[i]['home'] == 'string' && list[i]['home'].length>0)){
-            //codeArr是一个长度为3的数组分别是省市区的区域码，["130000","130300","130303"]，这里会转成 河北省/秦皇岛市/山海关区
-            let addr = list[i]['home'].split('/');
-            rs = [];
-            rs.push(TextToCode[addr[0]].code);
-            rs.push(TextToCode[addr[0]][addr[1]].code);
-            rs.push(TextToCode[addr[0]][addr[1]][addr[2]].code);
-            list[i]['home'] = rs;
-            // list[i]['home'] = TextToCode[addr[0]][addr[1]][addr[2]].code;
-        }
-        
-    }
-    return list;
-}
 
 //这里options设为空数组，是为了方便更改数据，下面会调用函数填上它们应有的值
 let baseForm = [
@@ -345,7 +263,6 @@ function getTableForm(){
 }
 
 
-export {getFormList,getTableForm,dateTranfer,inFormToNone,listMap,ptdToAddress,addressToPtd,dateBack,insertFormDateToBranch,formDate}
 
 
 var listMap = {
@@ -409,8 +326,6 @@ var listMap = {
     note:'备注',//
 
 
-
-
     // 申请入党阶段
     //入党积极分子的确定和培养阶段
     
@@ -424,3 +339,4 @@ var listMap = {
 
 
 
+export {getFormList,getTableForm,inFormToNone,listMap,formDate}

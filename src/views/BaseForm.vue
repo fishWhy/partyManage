@@ -183,12 +183,13 @@ export default {
         if(this.$route.query.isDisabled==="false"){
             this.disabled = false;
             this.status = 2;//表示 添加用户的状态
-            this.person = {};
+            this.person = this.listMap;
         }else{
             this.disabled = true;
             this.status = 1;//表示 详情/修改的状态
             this.stuId = this.$route.query.stuId;
-            this.person = fetchDataByStuId(this.stuId);
+            let personData = fetchDataByStuId(this.stuId);
+            this.person = Object.assign(this.listMap,personData) ;
             console.log('person:',this.person);
         }
 
@@ -233,7 +234,68 @@ export default {
             actvStageContent:{},
             devStageContent:{},
             candidateContent:{},
-            positiveContent:{}
+            positiveContent:{},
+
+            listMap: {
+                stuId:"",//学号
+                name:'',//姓名
+                gender:'',//性别
+                phone:'',//联系方式
+                national:'',//民族
+                home:'',//籍贯,使用了element-china-area-data
+                idCard:'',//身份证
+                birthday:'',//出生日期
+                grade:'',//年级
+                tclass:'',//班级
+                stuState:'',//学籍状态
+                major:'',//专业
+                proED:'',//学历
+                tutor:'',//导师
+                stage:'',//所处阶段
+                jnPartyTime:'',//党员增加时间
+                addParty:'',//党员增加
+                honour:'',//个人荣誉
+                bedroom:'',//寝室
+                duty:'',//职务
+                partyDuty:'',//党内职务
+                // branch:'1',//所在支部
+                branch:'',//所在支部
+                pTeacher:'',//培养联系人
+                leader:'',//入党介绍人
+                applyFileNumber:'',//入党志愿书编号
+                // 申请入党阶段
+                applyTime:'',//申请入党时间
+                talkTime:'',//谈心谈话时间
+                //入党积极分子的确定和培养阶段
+                electLeagueTime:'',//团推优时间
+                actvTime:'',//确定积极分子时间
+                actvTrainTime:'',//积极分子培训时间
+                actvTrainResult:'',//积极分子培训班结业情况
+                //发展对象的确定和考察阶段
+                devTime:'',//确定发展对象时间
+                devTrainTime:'',//发展对象培训时间
+                devTrainResult:'',//发展对象培训班结业情况
+                classRank:'',//业务课排名
+                extFileTime:'',//外调材料日期
+                polFileTime:'',//政审材料日期
+                candidateTime:'',//拟发展时间
+                hPartyPreCheckTime:'',//发展党员上级党委预审日期
+                pubTime:'',//公示日期
+                // 预备党员的接收阶段
+                jnTime:'',//入党时间
+                aPartyCheckTime:'',//入党总支审查日期
+                hPartyTalkTime:'',//发展党员上级组织谈话日期
+                hPartyPassTime:'',//入党上级党委审批日期             
+                // 预备党员的教育考察和转正阶段
+                confirmTime:'',//转正时间
+                letterTime:'',//转正申请书时间
+                partyConfirmTime:'',//转正总支审查日期
+                hPartyConfirmTime:'',//转正上级党委审批日期
+                delayReadyTime:'',//延长预备期日期
+                delayCheckTime:'',//延长预备期总支审查日期
+                delayConfirmTime:'',//延长预备期党委审批日期           
+                note:'',//备注
+            },
 
         };
     },
@@ -384,7 +446,7 @@ export default {
 
             }catch(e){
                 console.log(e);
-                this.$message.error(`保存信息失败${e}`);
+                this.$message.error(`保存信息失败${e.error}`);
                
 
             }finally{

@@ -9,8 +9,8 @@
             style="width: 100%"
             id="branchTable314"
             size="small"
+            :row-class-name="tableRowClassName"
             >
-
                 <el-table-column
                   prop="branch"
                   label="支部名称"
@@ -118,10 +118,35 @@ export default {
           tableData:[],
         };
     },
+    
     methods:{
       getData(){
-        this.tableData = getBranchsData();
+        let tableData = JSON.parse(JSON.stringify(getBranchsData()));
+        if(tableData.length>0){
+          let obj = JSON.parse(JSON.stringify(tableData[0])), keys = Object.keys(obj);
+          for(let k of keys){
+            for(let i=1, item;i<tableData.length;i++){
+              item = tableData[i][k];
+              if(typeof item == 'number'){
+                obj[k] += item;
+              }
+            }
+          }
+          obj.branch = "总计"
+          obj.leader = "";
+          tableData.push(obj);
+        }
+
+        this.tableData = tableData;
         console.log('this.branchData',this.tableData);
+      },
+      tableRowClassName({row}){
+        // console.log('row branch',)
+        if(row.branch=='总计'){
+          return  'LightSteelBlue'
+        }else{
+          return ''
+        }
       },
       handleDetail:function(index, row){
         console.log(row);
@@ -155,5 +180,8 @@ export default {
   /* padding: 0px; */
   /* color: red;
 } */ 
+#branchTable314 .LightSteelBlue{
+    background-color: #B0C4DE;
+}
 
 </style>

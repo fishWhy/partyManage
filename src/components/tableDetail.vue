@@ -297,12 +297,12 @@ export default{
                 }
                 // console.log(item,  rnDate[item]);
             });
-
+            // console.log("rnDate:",rnDate);
             // 将query中值为0的 下拉框 对应的值由0值，置为''
             inFormToNone(rnDate);
             // console.log('getFormQuery:',rnQuery)
             let rn = JSON.parse(JSON.stringify(rnDate));
-            // console.log('rn:',rn);
+            // console.log('after parse rn:',rn);
 
             Object.keys(rn).forEach(item=>{
                 if(rn[item]==="undefined"){

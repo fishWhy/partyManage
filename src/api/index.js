@@ -1,7 +1,7 @@
 import request from '../utils/request';
 import { downLoadExcel,importfxx} from "../utils/excel/upDownExcel.js";
-import {ptdToAddress,dateTranfer,addressToPtd,dateBack,insertFormDateToBranch,formDate} from './formDate.js';
 
+import {transferDataFromBackEnd,transferDataToBE,transferDataFromExcel,tranferDataToExcel,transferExcelDataToBE,addressEncode} from './transfertData.js'
 
 /**
  * 
@@ -27,58 +27,9 @@ const requestData = (urlL,query, rqType = 'post') => {
 
 //返回处理数据的函数数组，数据以闭包的型式保存。
 let dataFun = (function(){
-    
-    // 将前端数据转变成后端需要的格式（将所有数据都变成字符串型式）
-    function transToBackEnd(dataArr){
-        let list = JSON.parse(JSON.stringify(dataArr));
-        let item;
-        //把list中的每一项转换成字符串
-        for(let i=0;i<list.length;i++){
-            item = list[i];
-            for(let k in item){
-                if(Object.prototype.hasOwnProperty.call(item,k)){
-                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'||k==='home')&&(item[k] instanceof Array)){
-                        item[k] = item[k].join(',');
 
-                    }else if(item[k]==''){
-                        item[k] = "_$"//为了后端好处理空值存成这种字符串
-                    }
-                }
-            }
-        }
-        console.log('list:',list);
-        return list;
-    }
 
-    //将后端数据转换成前端的格式
-    function tranDataToFrontEnd(list){
-        //把list中的actvTrainTime，devTrainTime，pubTime，home转成数组
-        let it, regT = /^[0-9]+,[0-9]+$/, regH = /^[0-9]+,[0-9]+,[0-9]+$/;//正则表达式一定要写上^和$表示以什么开头，以什么结尾
-        for(let i=0;i<list.length;i++){
-            it = list[i];
-            for(let k in it){
-                if(Object.prototype.hasOwnProperty.call(it,k)){
-                    if(it[k] == "_$"){
-                        it[k] = '';//_$为了后端好处理空值存成这种字符串,这里需要转换成前端的格式
-                    }else if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime')&&(typeof it[k] =="string" && it[k].length>0 &&  regT.test(it[k]))){
-                        it[k] = it[k].split(',');
-                    }else if(k==="home" &&(typeof it[k] =="string" && it[k].length>0 && regH.test(it[k]) )){
-                        it[k] = it[k].split(',');
-                    }else if(formDate[k]){// 如果是下拉选框，则转成1,2,3的格式
-                        Object.keys(formDate[k]).forEach(eItem=>{
-                            if(formDate[k][eItem]==it[k]){
-                                it[k] = eItem;
-                            }
-                        })  
-                    } 
-                }
-            }
-        }
 
-        // 将下拉框选项的数据转成要显示的样式即转成1,2,3
-
-        return list;
-    }
 
     function logIn(obj){
         localStorage.clear(); 
@@ -88,26 +39,29 @@ let dataFun = (function(){
         return requestData('/login',param,'post').then((item)=>{
             console.log('login item:',item);
             // console.log('token:',localStorage.token,localStorage.stuId);
+            if(item.code=='1000'){
+                return Promise.reject('用户名或密码错误，请重新登录')
+            }else if(!item.data){
+                return Promise.reject('登录失败，请重新尝试')
+            }else{
+                return item.data;// 将用户名，token，role值返回
+            }
 
-            return item.data;// 将用户名，token，role值返回
-        },()=>{throw new Error("登录失败,请输入正确的账号密码重新登录")});
+        },(err)=>{return Promise.reject(err)});
     }
    
     function getStartDataFromBackend(){
         return requestData('/refresh',{},'post').then((item)=>{
-            console.log('get data from backend item:',item);
-            data.branchs = item.data.branches;
-            console.log('branch:',item.data.brList);
-            insertFormDateToBranch('branch',item.data.brList);
-
+            console.log('get data from backend item:',JSON.parse(JSON.stringify(item)));
 
             // 将数据格式转变成前端需要的格式
-            let list = JSON.parse(JSON.stringify(item.data.infos));
-           
-            list = tranDataToFrontEnd(list);
+            item = transferDataFromBackEnd(item);
+            console.log('after transfer:',item)
+            data.branchs = item.data.branches;
+
+    
             //将获取的数据存储在data.list
-            data.list = list;
-            // console.log('get Data from:',data.list);
+            data.list = item.data.infos;
             return item.data.duty;
         },()=>Promise.reject('404'));
     }
@@ -117,14 +71,10 @@ let dataFun = (function(){
         
         return requestData('/personInfor',{},'post').then((item)=>{
             console.log('get data from backend item:',item);
-            insertFormDateToBranch('branch',item.data.brList);
+            item = transferDataFromBackEnd(item,true);
 
             // 将数据格式转变成前端需要的格式
-            let list = JSON.parse(JSON.stringify([item.data.infos]));
-            list = tranDataToFrontEnd(list);
-
-            console.log('get Data from:',list);
-            return list[0];
+            return item.data.infos;
         },()=>Promise.reject('404'));
     }
     function changePsw(obj){
@@ -189,28 +139,53 @@ let dataFun = (function(){
 
     //增
     // 将传入的数组dataItem添加到数据的结尾,在添加的过程中去重并跟新原先的值
-    function addDate(dataArr){
+    function addDate(dataArr, isfromExcel=false){
         return new Promise(function(resolve,reject){
             // 注意，dataArr是前端要显示的数据，list是要传给后端的数据，它们是不一样的
-            dataArr =  arrAttrUni(dataArr);
-            let list = transToBackEnd(dataArr);
-            console.log('dataArr:',dataArr);
-            console.log('list:',list);
+            dataArr =  arrAttrUni(JSON.parse(JSON.stringify(dataArr)));
+
+            console.log('the will be added data:',dataArr);
+
+            let list = isfromExcel?transferExcelDataToBE(dataArr):transferDataToBE(dataArr);
+
+            console.log('transferDataToBE style:',list);
             
 
             requestData('/updateAll',list,'post').then((item)=>{
+
                 console.log("updateAll item:",item);
-                insertFormDateToBranch('branch',item.data.brList);
+                transferDataFromBackEnd.dataPreProc(item);
                 data.branchs = item.data.branches;
 
-                let dataAdd = tranDataToFrontEnd(dataArr.length>0?dataArr:[]);
-                let dataFail = item.failedList.length>0?item.failedList:[];
-                let dataSort = item.data.infos.length>0?item.data.infos:[];
-                data.list = uniSortData(JSON.parse(JSON.stringify(data.list)),dataAdd,dataFail,dataSort);
+                let newData = isfromExcel?transferDataFromExcel(dataArr):JSON.parse(JSON.stringify(dataArr));
 
-                resolve({state:202, failList:dataFail});
+                console.log('tranDataToFrontEnd style :', newData);
+
+
+                let dataFail = item.failedList;
+                let dataSort = item.data.infos;
+                data.list = uniSortData(JSON.parse(JSON.stringify(data.list)),newData,dataFail,dataSort);
+
+                // 返回成功添加，失败添加的数据,返回的failArr,successArr必须是数组
+                let failArr = [], successArr = [];
+                let failObj = {};
+                for(let it of dataFail){
+                    failObj[it] = true;
+                }
+                for(let it of dataArr){
+                    if(failObj[it.stuId]){
+                        failArr.push(it)
+                    }else{
+                        successArr.push(it)
+                    }
+                }
+                resolve({state:202, failList:failArr,successList:successArr});
             },item=>{
-                reject(item);
+                let failArr = [];
+                for(let it of dataArr){
+                    failArr.push(it);
+                }
+                reject({error:item, failList:failArr,successList:[]});
             });      
         })
     }
@@ -266,7 +241,9 @@ let dataFun = (function(){
                         // len--;
                     } 
                 }
-                insertFormDateToBranch('branch',item.data.brList);
+                
+                transferDataFromBackEnd.dataPreProc(item);
+
                 data.branchs = item.data.branches;
 
                 resolve('成功删除')
@@ -285,7 +262,7 @@ let dataFun = (function(){
     function cInfor(infor){
         // 注意，infor是前端要显示的数据，list是要传给后端的数据，它们是不一样的
         // console.log('cInfor')
-        let list = transToBackEnd([infor]);
+        let list = transferDataToBE([infor]);
         // console.log('')
 
         return new Promise(function(resolve,reject){
@@ -495,7 +472,7 @@ let dataFun = (function(){
     async function  setNewData (tableData){
          return new Promise(function(resolve,reject){
             let arr = JSON.parse(JSON.stringify(tableData));
-            let list = transToBackEnd(arr);
+            let list = transferDataToBE(arr);
             // console.log("arr:",arr)
             requestData('/addInfoAll',list,'post').then((item)=>{
                 console.log('addInfoAll item:',item);
@@ -649,7 +626,7 @@ let dataFun = (function(){
         }
     }
     function downDateStyle(list){
-        return dateTranfer(ptdToAddress(list));
+        return tranferDataToExcel(list);
     }
 
     // 从表格中导入数据
@@ -668,67 +645,47 @@ let dataFun = (function(){
             try{
                 _data = await importfxx(fileList[i].raw, filesObj.listTitle,filesObj.tableTitle);
                 
-                console.log("beforeStyle:",_data)
-                _data = loadDateStyle(_data);
-                console.log("afterStyle:",_data);
+               _data = JSON.parse(JSON.stringify(_data));
+               for(let i=0, listItem;i<_data.length;i++){
+                    listItem = _data[i];
+                    // 自动补全数据
+                    if(!listItem['partyDuty'] && listItem['stage']=="正式党员"){
+                        listItem['partyDuty'] = '普通党员';
+                    }
+                    if(!listItem['partyDuty'] || listItem['stage']!="正式党员"){
+                        listItem['partyDuty'] = '其他';
+                    }
+                    if(!listItem['stage']){
+                        listItem['stage'] = "其他";
+                    }
+
+                    if(listItem['home']){// 如果有 籍贯，就对籍贯进行编码
+                        listItem['home'] = addressEncode(listItem['home']);
+                    }
+                
+                    // 空数据就用 _$ 补充
+                    for(let k in listItem){
+                        if(!listItem[k]){
+                            listItem[k] = '_$';
+                        }
+                    }
+
+               }
                 tableArray = tableArray.concat(_data);
                 tableArray = arrUni(tableArray);
-                // console.log('tableArray:',tableArray);
 
-                
             } catch(e){
                 console.log('erro:',e)
                 return [];
             }
         }
-        console.log('tableArray:',tableArray);
+        console.log('loadData from Excel:',JSON.parse(JSON.stringify(tableArray)));
 
         return tableArray;
     }
 
-    //list是一个数组
-    function loadDateStyle(list){
-        list = arrUni(list);
 
-        let item,arr;
-        //把list中的每一项转换成字符串
-        for(let i=0;i<list.length;i++){
-            item = list[i];
-            for(let k in item){
-                if(Object.prototype.hasOwnProperty.call(item,k)){
-                //》》》》这里其实涉及到一个问题，我们通过importfxx从表格获取的数据不一定都是字符串类型的数据，
-                    item[k] = item[k]+'';
-                    if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'||k==='home')&&(typeof item[k]=='string' && item[k].length>0)){
-                        
-                        arr = item[k].split(',');
-                        item[k] = arr;
-
-                    }
-                    
-                   
-                }
-            }
-            if(!item['partyDuty'] && item['stage']=="正式党员"){
-                item['partyDuty'] = '普通党员';
-            }
-            if(!item['partyDuty'] || item['stage']!="正式党员"){
-                item['partyDuty'] = '其他';
-            }
-            if(!item['stage']){
-                item['stage'] = "其他";
-            }
-
-            // 将导入的数据做补充
-            // 如果branch为空，就将_$ 变成其他
-            if(!item['branch']){
-                item['branch'] = '其他';
-            } 
-
-        }
-
-        return addressToPtd(dateBack(list));
-    }
-
+    
 
     // 获取关于支部branchs相关的数据。
     function getBranchsData(){
