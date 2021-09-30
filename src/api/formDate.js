@@ -277,8 +277,8 @@ var listMap = {
     branch:'所在支部',//所在支部
     proED:'学历',//学历
     grade:'年级',//年级
-    major:'专业',//专业
     tclass:'班级',//班级
+    major:'专业',//专业
     classRank:'业务课排名',//业务课排名
     duty:'职务',//职务
     partyDuty:'党内职务',//党内职务

@@ -1,10 +1,14 @@
 <template>
     <div class="login-wrap">
+        <wave ref="signRef1"></wave>
+        <wave ref="signRef2"></wave>
+        <wave ref="signRef3"></wave>
+
         <div class="ms-login" v-if="isLogin">
             <div class="ms-title">党员信息管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content" >
                 <el-form-item prop="userName">
-                    <el-input v-model="param.userName" placeholder="userName">
+                    <el-input v-model="param.userName" placeholder="学号或工号">
                         <template #prepend>
                             <el-button icon="el-icon-user"></el-button>
                         </template>
@@ -14,7 +18,7 @@
                 <el-form-item prop="password">
                     <el-input
                         type="password"
-                        placeholder="password"
+                        placeholder="密码"
                         v-model="param.password"
                     >
                         <!-- 可以去看看vue的插槽，就能明白这里的template #prepend的意思 -->
@@ -27,7 +31,7 @@
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
                 <div style="overflow:hidden;">
-                    <span class="login-tips" style="font-size:12px;">Tips : 用户名必须为4到10位的数字，密码必须6到10位的数字或字母。</span>
+                    <span class="login-tips" style="font-size:12px;">Tips : 用户名必须为4到10位数字的学号或工号，密码必须6到10位的数字或字母。</span>
                     <span class="login-tipsPs" @click="isLogin = false">修改密码?</span>
                 </div>
             </el-form>
@@ -36,8 +40,8 @@
         <div class="chPassword" v-else>
             <div class="ms-title">修改密码</div>
             <el-form :model="nPassword" :rules="paRules" ref="cPassword" label-width="0px" class="ms-content" >
-                <el-form-item prop="userName">
-                    <el-input v-model="nPassword.userName" placeholder="用户名">
+                <el-form-item prop="userName" class="form-item">
+                    <el-input v-model="nPassword.userName" placeholder="学号或工号">
                         <template #prepend>
                             <el-button icon="el-icon-user"></el-button>
                         </template>
@@ -45,7 +49,7 @@
                     </el-input>
                 </el-form-item>
 
-                <el-form-item prop="password">
+                <el-form-item prop="password" class="form-item">
                     <el-input
                         type="password"
                         placeholder="老密码"
@@ -58,7 +62,7 @@
                     </el-input>
                 </el-form-item>
 
-                <el-form-item prop="nPassword">
+                <el-form-item prop="nPassword" class="form-item">
                     <el-input
                         type="password"
                         placeholder="新密码"
@@ -71,7 +75,7 @@
                     </el-input>
                 </el-form-item>
 
-                <el-form-item prop="confirmNPassword">
+                <el-form-item prop="confirmNPassword" class="form-item">
                     <el-input
                         type="password"
                         placeholder="再次输入新密码"
@@ -88,7 +92,7 @@
                     <el-button type="primary" @click="changePassword()">确定</el-button>
                 </div>
                 <div style="overflow:hidden;">
-                    <span class="login-tips" style="font-size:12px;">Tips : 用户名必须为4到10位的数字，密码必须6到10位的数字或字母。</span>
+                    <span class="login-tips" style="font-size:12px;">Tips : 用户名必须为4到10位数字的学号或工号，密码必须6到10位的数字或字母。</span>
                     <span class="login-tipsPs" @click="isLogin=true">返回登录</span>
                 </div>
             </el-form>
@@ -98,14 +102,25 @@
 
 <script>
 import {logIn,changePsw} from '../api/index.js'
+import wave from '../components/canvsWave/wave.vue'
 
 export default {
+    components:{
+        wave
+    },
+    mounted(){
+        setTimeout(()=>{
+            this.$refs.signRef1.setColor("rgba(38,188,213,0.1)")
+            this.$refs.signRef2.setColor("rgba(240,230,140,0.1)")
+            this.$refs.signRef3.setColor("rgba(144,238,144,0.1)")
+        })
+    },
     data() {
         return {
             isLogin:true,
             param: {
-                userName: "00008612",
-                password: "123456",
+                userName: "",
+                password: "",
                 // userName: "",
                 // password: ""
             },
@@ -257,7 +272,7 @@ export default {
     font-size: 14px;
     line-height: 30px;
     color: rgb(77, 88, 243);
-    margin-left: 140px;
+    margin-left: 60px;
 }
 
 
@@ -274,5 +289,9 @@ export default {
 }
 .login-tipsPs:hover{
     cursor:pointer
+}
+
+.form-item{
+    margin-bottom: 15px;
 }
 </style>

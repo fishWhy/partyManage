@@ -1,7 +1,7 @@
 import request from '../utils/request';
 import { downLoadExcel,importfxx} from "../utils/excel/upDownExcel.js";
 
-import {transferDataFromBackEnd,transferDataToBE,transferDataFromExcel,tranferDataToExcel,transferExcelDataToBE,addressEncode} from './transfertData.js'
+import {transferDataFromBackEnd,transferDataToBE,transferDataFromExcel,tranferDataToExcel,transferExcelDataToBE,addressEncode} from './transferData.js'
 
 /**
  * 
@@ -593,16 +593,14 @@ let dataFun = (function(){
     function downDate(filterObj,query,exportIds){
         if(filterObj.type===0){
             // 下载模板
-            let arr = JSON.parse(JSON.stringify([downLoadTemp]));
-            let downDate = downDateStyle(arr);
+            let downDate = tranferDataToExcel([downLoadTemp]);
             // console.log("downDate:",downDate);
-            downLoadExcel(downDate, filterObj.listTitle, filterObj.tableTitle,'支部成员信息'); 
+            downLoadExcel(downDate, filterObj.listTitle, filterObj.tableTitle,'支部成员信息模板'); 
         } else if(filterObj.type===1){
             //下载所有数据
             fetchDataToDown(query).then((_data)=>{
                 //一定要在下载时，将数据深复制一次，将data.list与后面的操作隔离开来
-                let arr = JSON.parse(JSON.stringify(_data.list));
-                let downDate = downDateStyle(arr);
+                let downDate = tranferDataToExcel(_data.list);
                 downLoadExcel(downDate, filterObj.listTitle, filterObj.tableTitle,'支部成员信息'); 
         
             })
@@ -617,16 +615,13 @@ let dataFun = (function(){
                         downArr.push(item);
                     }
                 });
-                console.log('downAr',downArr);
+                console.log('downloadDataToExcel',downArr);
                 
-                let downDate = downDateStyle(downArr);
+                let downDate = tranferDataToExcel(downArr);
                 downLoadExcel(downDate, filterObj.listTitle, filterObj.tableTitle,'支部成员信息'); 
         
             })
         }
-    }
-    function downDateStyle(list){
-        return tranferDataToExcel(list);
     }
 
     // 从表格中导入数据
@@ -769,77 +764,6 @@ let dataFun = (function(){
             //     note:'信息好多，代码好长',//备注
             
             // },
-
-            // {
-            //     stuId:"1571232",//学号
-            //     name:'赵亮',//姓名
-            //     gender:'2',//性别
-            //     phone:'123415',//联系方式
-            //     national:'2',//民族
-            //     home:["130000","130300","130303"],//籍贯,使用了element-china-area-data
-            //     idCard:'13141414',//身份证
-            //     birthday:'19950112',//出生日期
-            //     grade:'19级',//年级
-            //     tclass:'1901班',//班级
-            //     stuState:'2',//学籍状态
-            //     major:'软件工程',//专业
-            //     proED:'1',//学历
-            //     tutor:'于师傅',//导师
-            //     stage:'1',//所处阶段
-            //     jnPartyTime:'20210516',//党员增加时间
-            //     addParty:'2',//党员增加
-            //     honour:'东北大学一等奖学金',//个人荣誉
-            //     bedroom:'3舍A231',//寝室
-            //     duty:'班长',//职务
-            //     partyDuty:'组织委员',//党内职务
-            //     // branch:'1',//所在支部
-            //     branch:'第二党支部',//所在支部
-            //     pTeacher:'李福',//培养联系人
-            //     leader:'上官云',//入党介绍人
-            //     applyFileNumber:'13415',//入党志愿书编号
-            
-            
-            //     // 申请入党阶段
-            //     applyTime:'20190920',//申请入党时间
-            //     talkTime:'20191005',//谈心谈话时间
-            
-            //     //入党积极分子的确定和培养阶段
-            //     electLeagueTime:'20191025',//团推优时间
-            //     actvTime:'2020051',//确定积极分子时间
-            //     actvTrainTime:['20200708','20200801'],//积极分子培训时间
-            //     actvTrainResult:'1',//积极分子培训班结业情况
-            
-            //     //发展对象的确定和考察阶段
-            //     devTime:'20201201',//确定发展对象时间
-            //     devTrainTime:['20210201','20210302'],//发展对象培训时间
-            //     devTrainResult:'1',//发展对象培训班结业情况
-            //     classRank:'6',//业务课排名
-            //     extFileTime:'20210412',//外调材料日期
-            //     polFileTime:'20210412',//政审材料日期
-            //     candidateTime:'202104',//拟发展时间
-            //     hPartyPreCheckTime:'20210418',//发展党员上级党委预审日期
-            //     pubTime:['20210201','20210302'],//公示日期
-            
-            //     // 预备党员的接收阶段
-            //     jnTime:'20210502',//入党时间
-            //     aPartyCheckTime:'20210503',//入党总支审查日期
-            //     hPartyTalkTime:'20210504',//发展党员上级组织谈话日期
-            //     hPartyPassTime:'20210505',//入党上级党委审批日期
-                
-                
-            //     // 预备党员的教育考察和转正阶段
-            //     confirmTime:'20190506',//转正时间
-            //     letterTime:'20190910',//转正申请书时间
-            //     partyConfirmTime:'20210506',//转正总支审查日期
-            //     hPartyConfirmTime:'20210507',//转正上级党委审批日期
-            //     delayReadyTime:'20210508',//延长预备期日期
-            //     delayCheckTime:'20210508',//延长预备期总支审查日期
-            //     delayConfirmTime:'20210512',//延长预备期党委审批日期
-            
-            
-            //     note:'信息好多，代码好长',//备注
-            
-            // }
 
         ],
         branchs:[

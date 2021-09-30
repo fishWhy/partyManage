@@ -126,19 +126,18 @@
        
 
         <!-- 导入excel -->
-        <el-dialog title="导入Excel" v-model="importVisible" width="490px" >
+        <el-dialog title="导入Excel" v-model="importVisible" width="490px">
             <div id="elD_314">
                 <div>
                     <el-tag>导入Excel格式要求</el-tag>
                     <div style="margin-top:10px">
-                        导入的Excel时,籍贯一定要加/(如:河北省/秦皇岛市/山海关区),否则会导入错误。
+                        导入的Excel时,籍贯一定要加/(如:河北省/秦皇岛市/山海关区),否则会导入错误。所在支部要包含支部二字。
                         <span style="color:red" >具体格式可见模板下载按钮中的例子。</span>
                          <el-button type="danger" icon="el-icon-download" @click="getExcelTemplate" size="mini">模板下载</el-button>
                     </div>
                 </div>
                 <div style="margin-top:20px;">
                     <div  style="margin-bottom:10px"><el-tag>导入Excel文件</el-tag></div>
-
                     <el-upload
                         class="upload-demo"
                         action=""
@@ -153,25 +152,24 @@
                         id="el_upload_314"
                         ref="el_upload_314">
                         <el-button size="small" type="primary" icon="el-icon-upload">点击导入excel</el-button>
-                        
                         <template #tip>
                             <div class="el-upload__tip">
                                 <span>最多只能上传1个xlsx/xls文 件</span>
                             </div>
-                            
                         </template>
                     </el-upload>
                 </div>
-                
             </div>
-            
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="importVisible=false">取 消</el-button>
-                    <el-button type="primary" @click="saveUploadExcel">确 定</el-button>
+                    <el-button type="primary" @click="saveUploadExcel" v-loading.fullscreen.lock="fullscreenLoading">确 定</el-button>
                 </span>
             </template>
         </el-dialog>
+
+
+
 
 
 
@@ -218,7 +216,7 @@
 
 
         <!-- 导入excel后，显示导入成功或失败的列表 -->
-        <el-dialog title="导入Excel" v-model="afterImpDialog.visible" width="640px" >
+        <el-dialog title="导入Excel" v-model="afterImpDialog.visible" width="640px">
             <div id="elD_315">
                 <div>
                     <el-container >
@@ -301,6 +299,7 @@ export default {
             formList: '',
             formData:'',
             activeName:'apply',
+            fullscreenLoading:false,
             
 
 
@@ -772,7 +771,7 @@ export default {
                 filesObj.listTitle= this.listTitle;
                 filesObj.tableTitle= this.tableTitle;
 
-                
+                this.fullscreenLoading = true;
                 let tableArray = await loadDateFromExcel(filesObj);
                 // console.log('tableArray:',tableArray)
                 
@@ -798,13 +797,13 @@ export default {
                     }
 
                     console.log('afterImpDialog:',this.afterImpDialog)
+                    this.fullscreenLoading = false;
 
                     this.afterImpDialog.visible = true;
                     this. formList = getFormList();
 
                     //更新当前页面的内容
                     this.resetQueryData();
-                    this.importVisible = false; 
                                   
 
                 }catch(e){
@@ -822,6 +821,7 @@ export default {
                             arr = [];
                         }
                     }
+                    this.fullscreenLoading = false;
                     this.afterImpDialog.visible = true;
                 }
 
@@ -831,8 +831,7 @@ export default {
         
         //下载excel模板
         getExcelTemplate(){
-            let that = this;
-            let obj = {type:0,  listTitle: that.listTitle,  tableTitle: that.tableTitle}
+            let obj = {type:0,  listTitle: this.listTitle,  tableTitle: this.tableTitle}
             
             downDate(obj);
         },

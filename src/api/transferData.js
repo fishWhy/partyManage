@@ -129,6 +129,10 @@ function transferDataFromExcel(list){
             if(Object.prototype.hasOwnProperty.call(item,k)){
             //》》》》这里其实涉及到一个问题，我们通过importfxx从表格获取的数据不一定都是字符串类型的数据，
                 item[k] = item[k]+'';
+                if(!item[k]||item[k]=='_$'){
+                    item[k] = '';
+                    continue;
+                }
 
                 if((k==="actvTrainTime"||k==='devTrainTime'||k==='pubTime'||k==='home')&&(typeof item[k]=='string' && item[k].length>0)){                        
                     arr = item[k].split(',');

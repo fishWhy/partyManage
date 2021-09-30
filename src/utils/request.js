@@ -7,10 +7,15 @@ const service = axios.create({
     // easy-mock服务挂了，暂时不使用了
     // baseURL: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
     // baseURL:'http://172.22.22.35:8080/api/internal',
-    // baseURL:'http://lizhangjie.cn:8080/api/internal',
+
+    baseURL:'http://172.16.10.65:8080/api/internal',
+
+    // baseURL:'http://172.16.10.65:8888/api/internal',
+    // http://172.16.10.65:8888
+    
     // baseURL:'http://localhost:8080/api/internal',
     
-    baseURL:'http://172.22.14.96:8080/api/internal',
+    // baseURL:'http://172.22.14.96:8080/api/internal',
 
     // baseURL:'http://127.0.0.1:8080/api/internal',
     
@@ -19,7 +24,7 @@ const service = axios.create({
     // withCredentials: true,
     // headers: {'content-type': 'application/x-www-form-urlencoded'},
 
-    timeout: 120000
+    timeout: 240000
 });
 
 

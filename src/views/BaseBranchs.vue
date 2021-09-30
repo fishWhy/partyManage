@@ -124,16 +124,27 @@ export default {
         let tableData = JSON.parse(JSON.stringify(getBranchsData()));
         if(tableData.length>0){
           let obj = JSON.parse(JSON.stringify(tableData[0])), keys = Object.keys(obj);
+
           for(let k of keys){
-            for(let i=1, item;i<tableData.length;i++){
-              item = tableData[i][k];
-              if(typeof item == 'number'){
-                obj[k] += item;
+            if(k!='id' && k!='branch' && k!='leader'){
+              for(let i=1, item;i<tableData.length;i++){
+                item = tableData[i][k];
+                if(typeof item == 'number'){
+                  obj[k] += item;
+                }
               }
             }
           }
+          
+          let sum = 0;
+          for(let k of keys){
+            if(k!= 'id' &&k!= 'branch' && k!= 'leader' && typeof obj[k] == 'number'){
+              sum = sum + obj[k];
+            }
+          }
+
           obj.branch = "总计"
-          obj.leader = "";
+          obj.leader = sum+'';
           tableData.push(obj);
         }
 
